@@ -4,20 +4,20 @@ using Microsoft.Extensions.ObjectPool;
 namespace Autofac.Pooling
 {
     /// <summary>
-    /// Container class that that will return the wrapped instance to the provided pool when it is disposed.
+    /// Tracking class that that will return the wrapped instance to the provided pool when it is disposed.
     /// </summary>
     /// <typeparam name="TPooledObject">The type of the object being pooled.</typeparam>
-    internal sealed class PoolInstanceContainer<TPooledObject> : IDisposable
+    internal sealed class PooledInstanceTracker<TPooledObject> : IDisposable
         where TPooledObject : class
     {
         private readonly ObjectPool<TPooledObject> _pool;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PoolInstanceContainer{TLimit}"/> class.
+        /// Initializes a new instance of the <see cref="PooledInstanceTracker{TLimit}"/> class.
         /// </summary>
         /// <param name="pool">The pool.</param>
         /// <param name="instance">The instance to wrap.</param>
-        public PoolInstanceContainer(ObjectPool<TPooledObject> pool, TPooledObject instance)
+        public PooledInstanceTracker(ObjectPool<TPooledObject> pool, TPooledObject instance)
         {
             _pool = pool;
             Instance = instance;

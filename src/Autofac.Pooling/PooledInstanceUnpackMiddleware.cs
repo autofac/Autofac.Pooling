@@ -19,7 +19,7 @@ namespace Autofac.Pooling
             next(context);
 
             // 'Unpack' the pool instance so what the consumer sees is just the implementation.
-            if (context.Instance is PoolInstanceContainer<TLimit> poolInstanceContainer)
+            if (context.Instance is PooledInstanceTracker<TLimit> poolInstanceContainer)
             {
                 context.Instance = poolInstanceContainer.Instance;
             }

@@ -56,7 +56,7 @@ namespace Autofac.Pooling
                 // Need to return a 'container' that
                 // gets unpacked just after we're done sharing.
                 // That way disposal of the scope will return to the pool.
-                ctxt.Instance = new PoolInstanceContainer<TLimit>(pool, poolItem);
+                ctxt.Instance = new PooledInstanceTracker<TLimit>(pool, poolItem);
             });
         }
 

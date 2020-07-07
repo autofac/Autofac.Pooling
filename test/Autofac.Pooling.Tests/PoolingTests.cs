@@ -13,6 +13,7 @@ namespace Autofac.Pooling.Tests
 
             var activateCounter = 0;
 
+            // Register a pooled instance. OnActivated only fires when actual instances of the component are created.
             builder.RegisterType<PooledComponent>().As<IPooledService>()
                                                    .PooledInstancePerLifetimeScope()
                                                    .OnActivated(args => activateCounter++);
@@ -29,10 +30,10 @@ namespace Autofac.Pooling.Tests
                 scope2.Resolve<IPooledService>();
             }
 
-            // Only 1 instance should have been activated.
+            // Only 1 instance should have been activated, because we retrieved from the pool each time.
             Assert.Equal(1, activateCounter);
 
-            // After we dispose of the container, our instances are disposed.
+            // When we dispose of the container, our instances are disposed by the pool.
             container.Dispose();
         }
 

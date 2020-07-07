@@ -8,7 +8,7 @@ namespace Autofac.Pooling
     /// <summary>
     /// Activator that resolves the object pool and retrieves from that rather than creating a new instance.
     /// </summary>
-    /// <typeparam name="TLimit">The instance type.</typeparam>
+    /// <typeparam name="TLimit">The limit type of the objects in the pool.</typeparam>
     internal sealed class PoolGetActivator<TLimit> : IInstanceActivator
         where TLimit : class
     {

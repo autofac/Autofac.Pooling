@@ -8,7 +8,7 @@ namespace Autofac.Pooling
     /// <summary>
     /// An activator for creating new <see cref="ObjectPool{TLimit}"/> instances.
     /// </summary>
-    /// <typeparam name="TLimit">The limit type of the pool items.</typeparam>
+    /// <typeparam name="TLimit">The limit type of the objects in the pool.</typeparam>
     internal sealed class PoolActivator<TLimit> : IInstanceActivator
         where TLimit : class
     {

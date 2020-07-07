@@ -6,7 +6,7 @@ namespace Autofac.Pooling
     /// <summary>
     /// Middleware for extracting the requested instance from the pool instance container.
     /// </summary>
-    /// <typeparam name="TLimit">The component type.</typeparam>
+    /// <typeparam name="TLimit">The limit type of the registration that has been pooled.</typeparam>
     internal sealed class PooledInstanceUnpackMiddleware<TLimit> : IResolveMiddleware
         where TLimit : class
     {

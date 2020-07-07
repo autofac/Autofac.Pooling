@@ -7,9 +7,9 @@ namespace Autofac.Pooling
     /// Defines the interface for a custom pooled registration policy, that defines what happens when an instance is retrieved from the pool, and
     /// what happens when the instance is returned to the pool.
     /// </summary>
-    /// <typeparam name="TLimit">The registration limit type.</typeparam>
-    public interface IPooledRegistrationPolicy<TLimit>
-        where TLimit : class
+    /// <typeparam name="TPooledObject">The type of object being pooled.</typeparam>
+    public interface IPooledRegistrationPolicy<TPooledObject>
+        where TPooledObject : class
     {
         /// <summary>
         /// Gets a value indicating the maximum number of items that will be retained in the pool.
@@ -30,7 +30,7 @@ namespace Autofac.Pooling
         /// <param name="ctxt">The current component context.</param>
         /// <param name="parameters">The set of parameters for the resolve request accessing the pool.</param>
         /// <param name="pooledObject">The object returned from the pool.</param>
-        void AfterGetFromPool(IComponentContext ctxt, IEnumerable<Parameter> parameters, TLimit pooledObject);
+        void AfterGetFromPool(IComponentContext ctxt, IEnumerable<Parameter> parameters, TPooledObject pooledObject);
 
         /// <summary>
         /// Invoked when an object is about to be returned into the pool. This method should be used to clean up the state of the object
@@ -41,6 +41,6 @@ namespace Autofac.Pooling
         /// True if the object should be returned to the pool.
         /// False if it should not be placed back in the pool (and will be disposed when the current scope ends).
         /// </returns>
-        bool BeforeReturn(TLimit pooledObject);
+        bool BeforeReturn(TPooledObject pooledObject);
     }
 }

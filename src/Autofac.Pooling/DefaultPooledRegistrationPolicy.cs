@@ -5,11 +5,11 @@ using Autofac.Core;
 namespace Autofac.Pooling
 {
     /// <summary>
-    /// Provides the default <see cref="IPooledRegistrationPolicy{TLimit}"/>.
+    /// Provides the default <see cref="IPooledRegistrationPolicy{TPooledObject}"/>.
     /// </summary>
-    /// <typeparam name="TLimit">The limit type.</typeparam>
-    public class DefaultPooledRegistrationPolicy<TLimit> : IPooledRegistrationPolicy<TLimit>
-        where TLimit : class
+    /// <typeparam name="TPooledObject">The type of object being pooled.</typeparam>
+    public class DefaultPooledRegistrationPolicy<TPooledObject> : IPooledRegistrationPolicy<TPooledObject>
+        where TPooledObject : class
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultPooledRegistrationPolicy{TLimit}"/> class.
@@ -42,12 +42,12 @@ namespace Autofac.Pooling
         }
 
         /// <inheritdoc/>
-        public virtual void AfterGetFromPool(IComponentContext ctxt, IEnumerable<Parameter> parameters, TLimit pooledObject)
+        public virtual void AfterGetFromPool(IComponentContext ctxt, IEnumerable<Parameter> parameters, TPooledObject pooledObject)
         {
         }
 
         /// <inheritdoc/>
-        public virtual bool BeforeReturn(TLimit pooledObject)
+        public virtual bool BeforeReturn(TPooledObject pooledObject)
         {
             return true;
         }

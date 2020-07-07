@@ -19,18 +19,18 @@ namespace Autofac.Pooling
         /// <summary>
         /// Invoked prior to an instance being resolved from the pool. This method can be used to block reads from the pool.
         /// </summary>
-        /// <param name="ctxt">The current component context.</param>
+        /// <param name="context">The current component context.</param>
         /// <param name="parameters">The set of parameters for the resolve request accessing the pool.</param>
-        void BeforeGetFromPool(IComponentContext ctxt, IEnumerable<Parameter> parameters);
+        void BeforeGetFromPool(IComponentContext context, IEnumerable<Parameter> parameters);
 
         /// <summary>
         /// Invoked after an instance has been retrieved from the pool. This method can be used to provide the pooled object with any
         /// dependencies local to the current scope.
         /// </summary>
-        /// <param name="ctxt">The current component context.</param>
+        /// <param name="context">The current component context.</param>
         /// <param name="parameters">The set of parameters for the resolve request accessing the pool.</param>
         /// <param name="pooledObject">The object returned from the pool.</param>
-        void AfterGetFromPool(IComponentContext ctxt, IEnumerable<Parameter> parameters, TPooledObject pooledObject);
+        void AfterGetFromPool(IComponentContext context, IEnumerable<Parameter> parameters, TPooledObject pooledObject);
 
         /// <summary>
         /// Invoked when an object is about to be returned into the pool. This method should be used to clean up the state of the object

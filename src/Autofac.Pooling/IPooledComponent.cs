@@ -14,9 +14,9 @@ namespace Autofac.Pooling
         /// Invoked when this instance is retrieved from the pool. Any dependencies retrieved using the provided <see cref="IComponentContext"/>
         /// MUST be discarded in <see cref="OnReturnToPool"/>, otherwise memory leaks may occur.
         /// </summary>
-        /// <param name="ctxt">The component context for the current resolve request.</param>
+        /// <param name="context">The component context for the current resolve request.</param>
         /// <param name="parameters">The parameters to the resolve request.</param>
-        void OnGetFromPool(IComponentContext ctxt, IEnumerable<Parameter> parameters);
+        void OnGetFromPool(IComponentContext context, IEnumerable<Parameter> parameters);
 
         /// <summary>
         /// Invoked when this instance is returned to the pool. Any dependencies retrieved in <see cref="OnGetFromPool"/> should

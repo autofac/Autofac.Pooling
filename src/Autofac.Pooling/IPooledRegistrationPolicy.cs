@@ -18,20 +18,13 @@ namespace Autofac.Pooling
         int MaximumRetained { get; }
 
         /// <summary>
-        /// Invoked prior to an instance being resolved from the pool. This method can be used to block reads from the pool.
+        /// Invoked when an instance of <typeparamref name="TPooledObject"/> is requested. The policy can invoke <paramref name="getFromPool"/> to
+        /// retrieve an instance from the pool. Equally, it could decide to ignore the pool, and just return a custom instance.
         /// </summary>
         /// <param name="context">The current component context.</param>
         /// <param name="parameters">The set of parameters for the resolve request accessing the pool.</param>
-        void BeforeGetFromPool(IComponentContext context, IEnumerable<Parameter> parameters);
-
-        /// <summary>
-        /// Invoked after an instance has been retrieved from the pool. This method can be used to provide the pooled object with any
-        /// dependencies local to the current scope.
-        /// </summary>
-        /// <param name="context">The current component context.</param>
-        /// <param name="parameters">The set of parameters for the resolve request accessing the pool.</param>
-        /// <param name="pooledObject">The object returned from the pool.</param>
-        void AfterGetFromPool(IComponentContext context, IEnumerable<Parameter> parameters, TPooledObject pooledObject);
+        /// <param name="getFromPool">A callback that will retrieve an item from the underlying pool of objects.</param>
+        TPooledObject Get(IComponentContext context, IEnumerable<Parameter> parameters, Func<TPooledObject> getFromPool);
 
         /// <summary>
         /// Invoked when an object is about to be returned into the pool. This method should be used to clean up the state of the object
@@ -42,6 +35,6 @@ namespace Autofac.Pooling
         /// True if the object should be returned to the pool.
         /// False if it should not be placed back in the pool (and will be disposed immediately if it implements <see cref="IDisposable"/>).
         /// </returns>
-        bool BeforeReturn(TPooledObject pooledObject);
+        bool Return(TPooledObject pooledObject);
     }
 }

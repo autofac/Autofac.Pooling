@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using Autofac.Core;
 using Autofac.Core.Resolving.Pipeline;
 using Microsoft.Extensions.ObjectPool;
@@ -35,28 +36,43 @@ namespace Autofac.Pooling
             pipelineBuilder.Use(PipelinePhase.Activation, (ctxt, next) =>
             {
                 var pool = (ObjectPool<TLimit>)ctxt.ResolveService(_poolService);
+                var didGetFromPool = false;
 
-                _registrationPolicy.BeforeGetFromPool(ctxt, ctxt.Parameters);
-
-                var poolItem = pool.Get();
-
-                if (poolItem is IPooledComponent poolAwareComponent)
+                TLimit PoolGet()
                 {
-                    poolAwareComponent.OnGetFromPool(ctxt, ctxt.Parameters);
+                    didGetFromPool = true;
+                    return pool.Get();
                 }
 
-                // This would conceivably allow a service to be captured into
-                // a pooled object, and if they don't clear it on return,
-                // that object would get left in the instance when it goes back in the pool,
-                // and would not be garbage-collected.
-                // Documentation necessary to emphasise how important it is to release resources.
-                // Implementation of IPooledComponent makes this easier.
-                _registrationPolicy.AfterGetFromPool(ctxt, ctxt.Parameters, poolItem);
+                var poolItem = _registrationPolicy.Get(ctxt, ctxt.Parameters, PoolGet);
 
-                // Need to return a 'container' that
-                // gets unpacked just after we're done sharing.
-                // That way disposal of the scope will return to the pool.
-                ctxt.Instance = new PooledInstanceTracker<TLimit>(pool, poolItem);
+                if (poolItem is null)
+                {
+                    throw new InvalidOperationException(
+                        string.Format(
+                            CultureInfo.CurrentCulture,
+                            PoolGetActivatorResources.PolicyMustReturnInstance,
+                            _registrationPolicy.GetType().FullName,
+                            typeof(TLimit).FullName));
+                }
+
+                if (didGetFromPool)
+                {
+                    if (poolItem is IPooledComponent poolAwareComponent)
+                    {
+                        poolAwareComponent.OnGetFromPool(ctxt, ctxt.Parameters);
+                    }
+
+                    // Need to return a 'container' that
+                    // gets unpacked just after we're done sharing.
+                    // That way disposal of the scope will return to the pool.
+                    ctxt.Instance = new PooledInstanceTracker<TLimit>(pool, poolItem);
+                }
+                else
+                {
+                    // Instance did not come from the pool, so just use it directly.
+                    ctxt.Instance = poolItem;
+                }
             });
         }
 

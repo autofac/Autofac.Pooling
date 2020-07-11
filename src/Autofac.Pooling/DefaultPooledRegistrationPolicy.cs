@@ -37,17 +37,18 @@ namespace Autofac.Pooling
         public int MaximumRetained { get; }
 
         /// <inheritdoc/>
-        public virtual void BeforeGetFromPool(IComponentContext ctxt, IEnumerable<Parameter> parameters)
+        public virtual TPooledObject Get(IComponentContext context, IEnumerable<Parameter> parameters, Func<TPooledObject> getFromPool)
         {
+            if (getFromPool is null)
+            {
+                throw new ArgumentNullException(nameof(getFromPool));
+            }
+
+            return getFromPool();
         }
 
         /// <inheritdoc/>
-        public virtual void AfterGetFromPool(IComponentContext ctxt, IEnumerable<Parameter> parameters, TPooledObject pooledObject)
-        {
-        }
-
-        /// <inheritdoc/>
-        public virtual bool BeforeReturn(TPooledObject pooledObject)
+        public virtual bool Return(TPooledObject pooledObject)
         {
             return true;
         }

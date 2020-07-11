@@ -13,17 +13,18 @@ namespace Autofac.Pooling.Tests.Utils
 
         public int OutOfPoolCount => _outOfPool;
 
-        public override void AfterGetFromPool(IComponentContext ctxt, IEnumerable<Parameter> parameters, TLimit pooledObject)
+        public override TLimit Get(IComponentContext context, IEnumerable<Parameter> parameters, Func<TLimit> getFromPool)
         {
             Interlocked.Increment(ref _outOfPool);
-            base.AfterGetFromPool(ctxt, parameters, pooledObject);
+
+            return getFromPool();
         }
 
-        public override bool BeforeReturn(TLimit pooledObject)
+        public override bool Return(TLimit pooledObject)
         {
             Interlocked.Decrement(ref _outOfPool);
 
-            return base.BeforeReturn(pooledObject);
+            return base.Return(pooledObject);
         }
     }
 }

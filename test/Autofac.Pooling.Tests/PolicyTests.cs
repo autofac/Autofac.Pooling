@@ -16,11 +16,9 @@ namespace Autofac.Pooling.Tests
             var events = new List<string>();
 
             var policy = new CustomPolicy<PooledComponent>(
-                (ctxt, param) => events.Add("before"),
-                (ctxt, param, instance) =>
-                {
-                    events.Add("after");
-                    Assert.NotNull(instance);
+                (ctxt, param, get) => {
+                    events.Add("get");
+                    return get();
                 },
                 (instance) =>
                 {
@@ -37,7 +35,44 @@ namespace Autofac.Pooling.Tests
                 scope.Resolve<IPooledService>();
             }
 
-            Assert.Equal(new[] { "before", "after", "return" }, events);
+            Assert.Equal(new[] { "get", "return" }, events);
+        }
+
+        [Fact]
+        public void PolicyCanChooseNotToGetFromThePool()
+        {
+            var builder = new ContainerBuilder();
+
+            var returnCalled = false;
+
+            var policy = new CustomPolicy<PooledComponent>(
+                (ctxt, param, get) => {
+                    return new PooledComponent();
+                },
+                (instance) =>
+                {
+                    returnCalled = true;
+                    return true;
+                });
+
+            builder.RegisterType<PooledComponent>().As<IPooledService>().PooledInstancePerLifetimeScope(policy);
+
+            var container = builder.Build();
+
+            IPooledService pooledInstance;
+
+            using (var scope = container.BeginLifetimeScope())
+            {
+                pooledInstance = scope.Resolve<IPooledService>();
+
+                Assert.Equal(0, pooledInstance.GetCalled);
+            }
+
+            Assert.Equal(0, pooledInstance.ReturnCalled);
+            Assert.Equal(1, pooledInstance.DisposeCalled);
+            Assert.False(returnCalled);
+
+            container.Dispose();
         }
 
         [Fact]
@@ -48,8 +83,10 @@ namespace Autofac.Pooling.Tests
             var counter = 0;
 
             var policy = new CustomPolicy<PooledComponent>(
-                (ctxt, param) => counter++,
-                (ctxt, param, instance) => {},
+                (ctxt, param, get) => {
+                    counter++;
+                    return get();
+                },
                 (instance) =>
                 {
                     counter--;
@@ -82,36 +119,27 @@ namespace Autofac.Pooling.Tests
         private class CustomPolicy<TLimit> : IPooledRegistrationPolicy<TLimit>
             where TLimit : class
         {
-            private readonly Action<IComponentContext, IEnumerable<Parameter>> _beforeGet;
-            private readonly Action<IComponentContext, IEnumerable<Parameter>, TLimit> _afterGet;
-            private readonly Func<TLimit, bool> _beforeReturn;
+            private readonly Func<IComponentContext, IEnumerable<Parameter>, Func<TLimit>, TLimit> _get;
+            private readonly Func<TLimit, bool> _return;
 
             public int MaximumRetained => 6;
 
             public CustomPolicy(
-                Action<IComponentContext, IEnumerable<Parameter>> beforeGet,
-                Action<IComponentContext, IEnumerable<Parameter>, TLimit> afterGet,
-                Func<TLimit, bool> beforeReturn)
+                Func<IComponentContext, IEnumerable<Parameter>, Func<TLimit>, TLimit> get,
+                Func<TLimit, bool> @return)
             {
-                _beforeGet = beforeGet;
-                _afterGet = afterGet;
-                _beforeReturn = beforeReturn;
+                _get = get;
+                _return = @return;
             }
 
-
-            public void BeforeGetFromPool(IComponentContext ctxt, IEnumerable<Parameter> parameters)
+            public TLimit Get(IComponentContext context, IEnumerable<Parameter> parameters, Func<TLimit> getFromPool)
             {
-                _beforeGet(ctxt, parameters);
+                return _get(context, parameters, getFromPool);
             }
 
-            public void AfterGetFromPool(IComponentContext ctxt, IEnumerable<Parameter> parameters, TLimit pooledObject)
+            public bool Return(TLimit pooledObject)
             {
-                _afterGet(ctxt, parameters, pooledObject);
-            }
-
-            public bool BeforeReturn(TLimit pooledObject)
-            {
-                return _beforeReturn(pooledObject);
+                return _return(pooledObject);
             }
         }
     }

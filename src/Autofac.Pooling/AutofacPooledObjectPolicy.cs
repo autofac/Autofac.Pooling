@@ -41,7 +41,7 @@ namespace Autofac.Pooling
                 poolAwareComponent.OnReturnToPool();
             }
 
-            if (_servicePolicy.BeforeReturn(obj))
+            if (_servicePolicy.Return(obj))
             {
                 return true;
             }

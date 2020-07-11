@@ -8,7 +8,7 @@ namespace Autofac.Pooling
     /// Components implementing this interface are aware that they are pooled, so will be notified when they are retrieved from the pool,
     /// and when they are returned to the pool.
     /// </summary>
-    public interface IPooledComponent : IDisposable
+    public interface IPooledComponent
     {
         /// <summary>
         /// Invoked when this instance is retrieved from the pool. Any dependencies retrieved using the provided <see cref="IComponentContext"/>
@@ -19,11 +19,15 @@ namespace Autofac.Pooling
         void OnGetFromPool(IComponentContext context, IEnumerable<Parameter> parameters);
 
         /// <summary>
-        /// Invoked when this instance is returned to the pool. Any dependencies retrieved in <see cref="OnGetFromPool"/> should
+        /// <para>
+        /// Invoked when this instance is being returned to the pool. Any dependencies retrieved in <see cref="OnGetFromPool"/> should
         /// be discarded in this method.
-        /// This method will NOT be invoked if the instance is not returned to the pool
-        /// (which can happen if this instance is held past the point of container disposal, or if the ).
-        /// The implementation of <see cref="IDisposable"/> should check and potentially discard any resources that <see cref="OnReturnToPool"/> would normally handle.
+        /// </para>
+        ///
+        /// <para>
+        /// If the maximum pool capacity has been reached (or a custom <see cref="IPooledRegistrationPolicy{T}"/> , this method will be invoked, but then the object will not be put back in
+        /// the pool (and may be disposed if the component implements <see cref="IDisposable"/>).
+        /// </para>
         /// </summary>
         void OnReturnToPool();
     }

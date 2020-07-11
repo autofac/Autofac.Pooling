@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Autofac.Core;
 
 namespace Autofac.Pooling
@@ -39,7 +40,7 @@ namespace Autofac.Pooling
         /// <param name="pooledObject">The pooled object.</param>
         /// <returns>
         /// True if the object should be returned to the pool.
-        /// False if it should not be placed back in the pool (and will be disposed when the current scope ends).
+        /// False if it should not be placed back in the pool (and will be disposed immediately if it implements <see cref="IDisposable"/>).
         /// </returns>
         bool BeforeReturn(TPooledObject pooledObject);
     }

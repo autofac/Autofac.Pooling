@@ -1,9 +1,10 @@
 ﻿using Autofac.Core;
+using System;
 using System.Collections.Generic;
 
 namespace Autofac.Pooling.Tests.Types
 {
-    public class PooledComponent : IPooledService, IPooledComponent
+    public class PooledComponent : IPooledService, IPooledComponent, IDisposable
     {
         public int GetCalled { get; private set; }
 

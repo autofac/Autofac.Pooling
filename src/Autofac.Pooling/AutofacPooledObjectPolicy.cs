@@ -36,13 +36,13 @@ namespace Autofac.Pooling
         /// <inheritdoc/>
         public bool Return(TPooledObject obj)
         {
+            if (obj is IPooledComponent poolAwareComponent)
+            {
+                poolAwareComponent.OnReturnToPool();
+            }
+
             if (_servicePolicy.BeforeReturn(obj))
             {
-                if (obj is IPooledComponent poolAwareComponent)
-                {
-                    poolAwareComponent.OnReturnToPool();
-                }
-
                 return true;
             }
 

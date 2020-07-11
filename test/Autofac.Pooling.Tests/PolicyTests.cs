@@ -40,6 +40,45 @@ namespace Autofac.Pooling.Tests
             Assert.Equal(new[] { "before", "after", "return" }, events);
         }
 
+        [Fact]
+        public void PolicyCanChooseNotToReturnToThePool()
+        {
+            var builder = new ContainerBuilder();
+
+            var counter = 0;
+
+            var policy = new CustomPolicy<PooledComponent>(
+                (ctxt, param) => counter++,
+                (ctxt, param, instance) => {},
+                (instance) =>
+                {
+                    counter--;
+                    return false;
+                });
+
+            builder.RegisterType<PooledComponent>().As<IPooledService>().PooledInstancePerLifetimeScope(policy);
+
+            var container = builder.Build();
+
+            IPooledService pooledInstance;
+
+            using (var scope = container.BeginLifetimeScope())
+            {
+                pooledInstance = scope.Resolve<IPooledService>();
+
+                Assert.Equal(1, counter);
+            }
+
+            Assert.Equal(0, counter);
+            Assert.Equal(1, pooledInstance.GetCalled);
+            Assert.Equal(1, pooledInstance.ReturnCalled);
+            Assert.Equal(1, pooledInstance.DisposeCalled);
+
+            container.Dispose();
+
+            Assert.Equal(1, pooledInstance.DisposeCalled);
+        }
+
         private class CustomPolicy<TLimit> : IPooledRegistrationPolicy<TLimit>
             where TLimit : class
         {

@@ -42,18 +42,18 @@
     <PackageReference Include="Autofac" Version="6.0.0-v6-00927" />
     <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="3.1.5" />
 
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="2.9.4">
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.4">
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" Condition="Exists('$(MSBuildThisFileDirectory)../../.git')">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.113">
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.164">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
   </ItemGroup>

@@ -64,6 +64,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>PoolGetActivatorResources.resx</DependentUpon>
     </Compile>
+    <Compile Update="PoolServiceResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>PoolServiceResources.resx</DependentUpon>
+    </Compile>
     <Compile Update="RegistrationExtensionsResources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -75,6 +80,10 @@
     <EmbeddedResource Update="PoolGetActivatorResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>PoolGetActivatorResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="PoolServiceResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>PoolServiceResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="RegistrationExtensionsResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

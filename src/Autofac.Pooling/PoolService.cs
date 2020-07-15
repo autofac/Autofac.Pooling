@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using Autofac.Core;
 using Microsoft.Extensions.ObjectPool;
 
@@ -21,7 +22,10 @@ namespace Autofac.Pooling
         }
 
         /// <inheritdoc/>
-        public override string Description => $"Pool of {_pooledItemRegistration.Activator.LimitType.FullName}";
+        public override string Description => string.Format(
+            CultureInfo.CurrentCulture,
+            PoolServiceResources.Description,
+            _pooledItemRegistration.Activator.LimitType.FullName);
 
         /// <inheritdoc/>
         public bool Equals(PoolService? other)

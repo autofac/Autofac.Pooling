@@ -17,7 +17,7 @@ if (Test-Path $artifactsPath) {
 
 # Install dotnet CLI
 if ($isWindows)
-
+{
     Write-Message "Installing .NET Core SDK version $sdkVersion"
     Install-DotNetCli -Version $sdkVersion
 }

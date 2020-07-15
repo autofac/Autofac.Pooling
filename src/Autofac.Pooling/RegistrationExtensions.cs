@@ -43,7 +43,10 @@ namespace Autofac.Pooling
                where TActivatorData : IConcreteActivatorData
                where TLimit : class
         {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
+            if (registration == null)
+            {
+                throw new ArgumentNullException(nameof(registration));
+            }
 
             RegisterPooled(registration, new DefaultPooledRegistrationPolicy<TLimit>(), null);
 
@@ -80,7 +83,10 @@ namespace Autofac.Pooling
                where TActivatorData : IConcreteActivatorData
                where TLimit : class
         {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
+            if (registration == null)
+            {
+                throw new ArgumentNullException(nameof(registration));
+            }
 
             RegisterPooled(registration, new DefaultPooledRegistrationPolicy<TLimit>(maximumRetainedInstances), null);
 
@@ -118,7 +124,10 @@ namespace Autofac.Pooling
                where TActivatorData : IConcreteActivatorData
                where TLimit : class
         {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
+            if (registration == null)
+            {
+                throw new ArgumentNullException(nameof(registration));
+            }
 
             RegisterPooled(registration, poolPolicy, null);
 
@@ -159,7 +168,10 @@ namespace Autofac.Pooling
                where TActivatorData : IConcreteActivatorData
                where TLimit : class
         {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
+            if (registration == null)
+            {
+                throw new ArgumentNullException(nameof(registration));
+            }
 
             RegisterPooled(registration, new DefaultPooledRegistrationPolicy<TLimit>(), lifetimeScopeTags);
 
@@ -202,7 +214,10 @@ namespace Autofac.Pooling
                where TActivatorData : IConcreteActivatorData
                where TLimit : class
         {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
+            if (registration == null)
+            {
+                throw new ArgumentNullException(nameof(registration));
+            }
 
             RegisterPooled(registration, new DefaultPooledRegistrationPolicy<TLimit>(maximumRetainedInstances), lifetimeScopeTags);
 
@@ -246,7 +261,10 @@ namespace Autofac.Pooling
                where TActivatorData : IConcreteActivatorData
                where TLimit : class
         {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
+            if (registration == null)
+            {
+                throw new ArgumentNullException(nameof(registration));
+            }
 
             RegisterPooled(registration, poolPolicy, lifetimeScopeTags);
 
@@ -261,7 +279,10 @@ namespace Autofac.Pooling
             where TActivatorData : IConcreteActivatorData
             where TLimit : class
         {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
+            if (registration == null)
+            {
+                throw new ArgumentNullException(nameof(registration));
+            }
 
             // Mark the lifetime appropriately.
             var regData = registration.RegistrationData;

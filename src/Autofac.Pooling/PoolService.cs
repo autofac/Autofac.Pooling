@@ -30,7 +30,7 @@ namespace Autofac.Pooling
         /// <inheritdoc/>
         public bool Equals(PoolService? other)
         {
-            return other != null && _pooledItemRegistration.Id == other._pooledItemRegistration.Id;
+            return other is object && _pooledItemRegistration.Id == other._pooledItemRegistration.Id;
         }
 
         /// <inheritdoc/>

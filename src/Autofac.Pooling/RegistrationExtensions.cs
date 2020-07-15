@@ -16,12 +16,11 @@ namespace Autofac.Pooling
     public static class RegistrationExtensions
     {
         /// <summary>
-        /// <para>
         /// Configure the component so that every dependent component or call to Resolve() within a single <see cref="ILifetimeScope"/>
         /// will return the same, shared instance, retrieved from a single pool of instances shared by all lifetime scopes.
         /// When the scope ends, the instance will be returned to the pool.
-        /// </para>
-        ///
+        /// </summary>
+        /// <remarks>
         /// <para>
         /// The size of the pool created with this method defaults to twice the number of processors (<see cref="Environment.ProcessorCount"/> x 2).
         /// If more instances are requested than the pool size, those instances may not be returned to the pool, but will instead be disposed/discarded.
@@ -31,7 +30,7 @@ namespace Autofac.Pooling
         /// If a component needs to perform behaviour when it is retrieved from or returned to the pool, it can implement <see cref="IPooledComponent"/>,
         /// or use the overload of this method that accepts a custom <see cref="IPooledRegistrationPolicy{TLimit}"/>.
         /// </para>
-        /// </summary>
+        /// </remarks>
         /// <typeparam name="TLimit">Registration limit type.</typeparam>
         /// <typeparam name="TActivatorData">Activator data type.</typeparam>
         /// <typeparam name="TSingleRegistrationStyle">Registration style.</typeparam>
@@ -52,12 +51,11 @@ namespace Autofac.Pooling
         }
 
         /// <summary>
-        /// <para>
         /// Configure the component so that every dependent component or call to Resolve() within a single <see cref="ILifetimeScope"/>
         /// will return the same, shared instance, retrieved from a single pool of instances shared by all lifetime scopes.
         /// When the scope ends, the instance will be returned to the pool.
-        /// </para>
-        ///
+        /// </summary>
+        /// <remarks>
         /// <para>
         /// The size of the pool created with this method is equal to <paramref name="maximumRetainedInstances"/>.
         /// If more instances are requested than the pool size, those instances may not be returned to the pool, but will instead be disposed/discarded.
@@ -67,7 +65,7 @@ namespace Autofac.Pooling
         /// If a component needs to perform behaviour when it is retrieved from or returned to the pool, it can implement <see cref="IPooledComponent"/>,
         /// or use the overload of this method that accepts a custom <see cref="IPooledRegistrationPolicy{TLimit}"/>.
         /// </para>
-        /// </summary>
+        /// </remarks>
         /// <typeparam name="TLimit">Registration limit type.</typeparam>
         /// <typeparam name="TActivatorData">Activator data type.</typeparam>
         /// <typeparam name="TSingleRegistrationStyle">Registration style.</typeparam>
@@ -90,12 +88,11 @@ namespace Autofac.Pooling
         }
 
         /// <summary>
-        /// <para>
         /// Configure the component so that every dependent component or call to Resolve() within a single <see cref="ILifetimeScope"/>
         /// will return the same, shared instance, retrieved from a single pool of instances shared by all lifetime scopes.
         /// When the scope ends, the instance will be returned to the pool.
-        /// </para>
-        ///
+        /// </summary>
+        /// <remarks>
         /// <para>
         /// This method accepts a custom <see cref="IPooledRegistrationPolicy{TLimit}"/> that provides fine-grained control of the retrieval
         /// of instances from the pool, and allows the implementer to choose whether or not the instance should even be returned to the pool.
@@ -106,7 +103,7 @@ namespace Autofac.Pooling
         /// <paramref name="poolPolicy"/>.
         /// If more instances are requested than the pool size, those instances may not be returned to the pool, but will instead be disposed/discarded.
         /// </para>
-        /// </summary>
+        /// </remarks>
         /// <typeparam name="TLimit">Registration limit type.</typeparam>
         /// <typeparam name="TActivatorData">Activator data type.</typeparam>
         /// <typeparam name="TSingleRegistrationStyle">Registration style.</typeparam>
@@ -129,7 +126,6 @@ namespace Autofac.Pooling
         }
 
         /// <summary>
-        /// <para>
         /// Configure the component so that every dependent component or call to Resolve() within
         /// a <see cref="ILifetimeScope"/> tagged with any of the provided tags value gets the same, shared instance,
         /// retrieved from a single pool of instances shared by all lifetime scopes.
@@ -137,8 +133,8 @@ namespace Autofac.Pooling
         /// Dependent components in lifetime scopes that are children of the tagged scope will
         /// share the parent's instance. If no appropriately tagged scope can be found in the
         /// hierarchy an <see cref="DependencyResolutionException"/> is thrown.
-        /// </para>
-        ///
+        /// </summary>
+        /// <remarks>
         /// <para>
         /// The size of the pool created with this method defaults to twice the number of processors (<see cref="Environment.ProcessorCount"/> x 2).
         /// If more instances are requested than the pool size, those instances may not be returned to the pool, but will instead be disposed/discarded.
@@ -148,7 +144,7 @@ namespace Autofac.Pooling
         /// If a component needs to perform behaviour when it is retrieved from or returned to the pool, it can implement <see cref="IPooledComponent"/>,
         /// or use the overload of this method that accepts a custom <see cref="IPooledRegistrationPolicy{TLimit}"/>.
         /// </para>
-        /// </summary>
+        /// </remarks>
         /// <typeparam name="TLimit">Registration limit type.</typeparam>
         /// <typeparam name="TActivatorData">Activator data type.</typeparam>
         /// <typeparam name="TSingleRegistrationStyle">Registration style.</typeparam>
@@ -171,7 +167,6 @@ namespace Autofac.Pooling
         }
 
         /// <summary>
-        /// <para>
         /// Configure the component so that every dependent component or call to Resolve() within
         /// a <see cref="ILifetimeScope"/> tagged with any of the provided tags value gets the same, shared instance,
         /// retrieved from a single pool of instances shared by all lifetime scopes.
@@ -179,8 +174,8 @@ namespace Autofac.Pooling
         /// Dependent components in lifetime scopes that are children of the tagged scope will
         /// share the parent's instance. If no appropriately tagged scope can be found in the
         /// hierarchy an <see cref="DependencyResolutionException"/> is thrown.
-        /// </para>
-        ///
+        /// </summary>
+        /// <remarks>
         /// <para>
         /// The size of the pool created with this method is equal to <paramref name="maximumRetainedInstances"/>.
         /// If more instances are requested than the pool size, those instances may not be returned to the pool, but will instead be disposed/discarded.
@@ -190,7 +185,7 @@ namespace Autofac.Pooling
         /// If a component needs to perform behaviour when it is retrieved from or returned to the pool, it can implement <see cref="IPooledComponent"/>,
         /// or use the overload of this method that accepts a custom <see cref="IPooledRegistrationPolicy{TLimit}"/>.
         /// </para>
-        /// </summary>
+        /// </remarks>
         /// <typeparam name="TLimit">Registration limit type.</typeparam>
         /// <typeparam name="TActivatorData">Activator data type.</typeparam>
         /// <typeparam name="TSingleRegistrationStyle">Registration style.</typeparam>
@@ -215,7 +210,6 @@ namespace Autofac.Pooling
         }
 
         /// <summary>
-        /// <para>
         /// Configure the component so that every dependent component or call to Resolve() within
         /// a <see cref="ILifetimeScope"/> tagged with any of the provided tags value gets the same, shared instance,
         /// retrieved from a single pool of instances shared by all lifetime scopes.
@@ -223,8 +217,8 @@ namespace Autofac.Pooling
         /// Dependent components in lifetime scopes that are children of the tagged scope will
         /// share the parent's instance. If no appropriately tagged scope can be found in the
         /// hierarchy an <see cref="DependencyResolutionException"/> is thrown.
-        /// </para>
-        ///
+        /// </summary>
+        /// <remarks>
         /// <para>
         /// This method accepts a custom <see cref="IPooledRegistrationPolicy{TLimit}"/> that provides fine-grained control of the retrieval
         /// of instances from the pool, and allows the implementer to choose whether or not the instance should even be returned to the pool.
@@ -235,7 +229,7 @@ namespace Autofac.Pooling
         /// <paramref name="poolPolicy"/>.
         /// If more instances are requested than the pool size, those instances may not be returned to the pool, but will instead be disposed/discarded.
         /// </para>
-        /// </summary>
+        /// </remarks>
         /// <typeparam name="TLimit">Registration limit type.</typeparam>
         /// <typeparam name="TActivatorData">Activator data type.</typeparam>
         /// <typeparam name="TSingleRegistrationStyle">Registration style.</typeparam>

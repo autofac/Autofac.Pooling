@@ -16,6 +16,7 @@ namespace Autofac.Pooling
         /// </summary>
         public DefaultPooledRegistrationPolicy()
         {
+            // Based on the default ObjectPool size in the .NET Runtime.
             MaximumRetained = Environment.ProcessorCount * 2;
         }
 

@@ -17,9 +17,9 @@ namespace Autofac.Pooling.Tests
             var events = new List<string>();
 
             var policy = new CustomPolicy<PooledComponent>(
-                (ctxt, param, get) => {
+                (ctxt, param, getCallback) => {
                     events.Add("get");
-                    return get();
+                    return getCallback();
                 },
                 (instance) =>
                 {
@@ -47,7 +47,7 @@ namespace Autofac.Pooling.Tests
             var returnCalled = false;
 
             var policy = new CustomPolicy<PooledComponent>(
-                (ctxt, param, get) => {
+                (ctxt, param, getCallback) => {
                     return new PooledComponent();
                 },
                 (instance) =>
@@ -84,9 +84,9 @@ namespace Autofac.Pooling.Tests
             var counter = 0;
 
             var policy = new CustomPolicy<PooledComponent>(
-                (ctxt, param, get) => {
+                (ctxt, param, getCallback) => {
                     counter++;
-                    return get();
+                    return getCallback();
                 },
                 (instance) =>
                 {
@@ -125,11 +125,11 @@ namespace Autofac.Pooling.Tests
             List<Parameter> policyReceivedParameters = new List<Parameter>();
 
             var policy = new CustomPolicy<PooledComponent>(
-                (ctxt, param, get) => {
+                (ctxt, param, getCallback) => {
 
                     policyReceivedParameters.AddRange(param);
 
-                    return get();
+                    return getCallback();
                 },
                 (instance) =>
                 {

@@ -1,7 +1,6 @@
 ﻿using Autofac.Features.Metadata;
 using Autofac.Features.OwnedInstances;
-using Autofac.Pooling.Tests.Types;
-using Autofac.Pooling.Tests.Utils;
+using Autofac.Pooling.Tests.Shared;
 using System;
 using System.Collections.Generic;
 using Xunit;

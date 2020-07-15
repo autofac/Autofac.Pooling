@@ -17,4 +17,8 @@
     <ProjectReference Include="..\..\src\Autofac.Pooling\Autofac.Pooling.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Utils\" />
+  </ItemGroup>
+
 </Project>

@@ -1,5 +1,4 @@
-﻿using Autofac.Pooling.Tests.Types;
-using Autofac.Pooling.Tests.Utils;
+﻿using Autofac.Pooling.Tests.Shared;
 using Xunit;
 
 namespace Autofac.Pooling.Tests

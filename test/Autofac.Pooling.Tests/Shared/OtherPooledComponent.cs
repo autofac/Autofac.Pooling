@@ -1,4 +1,4 @@
-﻿namespace Autofac.Pooling.Tests.Types
+﻿namespace Autofac.Pooling.Tests.Shared
 {
     public class OtherPooledComponent : IPooledService
     {

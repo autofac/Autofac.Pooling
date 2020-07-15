@@ -1,5 +1,5 @@
 ﻿using Autofac.Core;
-using Autofac.Pooling.Tests.Types;
+using Autofac.Pooling.Tests.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;

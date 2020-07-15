@@ -1,10 +1,9 @@
 ﻿using Autofac.Core;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 
-namespace Autofac.Pooling.Tests.Utils
+namespace Autofac.Pooling.Tests.Shared
 {
     public class PoolTrackingPolicy<TLimit> : DefaultPooledRegistrationPolicy<TLimit>
         where TLimit : class

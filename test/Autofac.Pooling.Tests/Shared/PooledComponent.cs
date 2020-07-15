@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Autofac.Pooling.Tests.Types
+namespace Autofac.Pooling.Tests.Shared
 {
     public class PooledComponent : IPooledService, IPooledComponent, IDisposable
     {

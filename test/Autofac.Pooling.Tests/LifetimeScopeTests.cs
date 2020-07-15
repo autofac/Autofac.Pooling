@@ -80,10 +80,9 @@ namespace Autofac.Pooling.Tests
 
             var container = builder.Build();
 
-            using (var scope = container.BeginLifetimeScope())
-            {
-                Assert.Throws<DependencyResolutionException>(() => scope.Resolve<IPooledService>());
-            }
+            using var scope = container.BeginLifetimeScope();
+
+            Assert.Throws<DependencyResolutionException>(() => scope.Resolve<IPooledService>());
         }
 
         [Fact]

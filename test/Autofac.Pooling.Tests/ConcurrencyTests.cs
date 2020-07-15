@@ -24,10 +24,9 @@ namespace Autofac.Pooling.Tests
 
             await Task.WhenAll(Enumerable.Range(0, 2000).Select(i => Task.Run(() =>
             {
-                using (var scope = container.BeginLifetimeScope())
-                {
-                    scope.Resolve<IPooledService>();
-                }
+                using var scope = container.BeginLifetimeScope();
+
+                scope.Resolve<IPooledService>();
             })));
 
             container.Dispose();
@@ -47,12 +46,11 @@ namespace Autofac.Pooling.Tests
 
             await Task.WhenAll(Enumerable.Range(0, 10000).Select(i => Task.Run(() =>
             {
-                using (var scope = container.BeginLifetimeScope())
-                {
-                    scope.Resolve<IPooledService>();
+                using var scope = container.BeginLifetimeScope();
 
-                    Assert.InRange(blockingPolicy.InUseCount, 1, 4);
-                }
+                scope.Resolve<IPooledService>();
+
+                Assert.InRange(blockingPolicy.InUseCount, 1, 4);
             })));
 
             container.Dispose();
@@ -61,7 +59,7 @@ namespace Autofac.Pooling.Tests
         private class BlockingPolicy<TLimit> : DefaultPooledRegistrationPolicy<TLimit>
             where TLimit : class
         {
-            private SemaphoreSlim _semaphore;
+            private readonly SemaphoreSlim _semaphore;
 
             public BlockingPolicy(int maxConcurrentInstances) : base(maxConcurrentInstances)
             {

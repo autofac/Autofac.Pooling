@@ -2,6 +2,7 @@
 using Autofac.Pooling.Tests.Types;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace Autofac.Pooling.Tests
@@ -114,6 +115,49 @@ namespace Autofac.Pooling.Tests
             container.Dispose();
 
             Assert.Equal(1, pooledInstance.DisposeCalled);
+        }
+
+        [Fact]
+        public void PolicyCanSeeParametersFromThePooledServiceResolve()
+        {
+            var builder = new ContainerBuilder();
+
+            List<Parameter> policyReceivedParameters = new List<Parameter>();
+
+            var policy = new CustomPolicy<PooledComponent>(
+                (ctxt, param, get) => {
+
+                    policyReceivedParameters.AddRange(param);
+
+                    return get();
+                },
+                (instance) =>
+                {
+                    return false;
+                });
+
+            builder.RegisterType<PooledComponent>().As<IPooledService>().PooledInstancePerLifetimeScope(policy);
+
+            var container = builder.Build();
+
+            IPooledService pooledInstance;
+
+            using (var scope = container.BeginLifetimeScope())
+            {
+                pooledInstance = scope.Resolve<IPooledService>(new NamedParameter("Val1", 123), new TypedParameter(typeof(int), 456));
+            }
+
+            Assert.Collection(policyReceivedParameters,
+                p =>
+                {
+                    Assert.Equal("Val1", (p as NamedParameter)?.Name);
+                },
+                p =>
+                {
+                    Assert.Equal(456, (p as TypedParameter)?.Value);
+                });
+
+            container.Dispose();
         }
 
         private class CustomPolicy<TLimit> : IPooledRegistrationPolicy<TLimit>

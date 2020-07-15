@@ -308,73 +308,72 @@ namespace Autofac.Pooling
             Action<IComponentRegistryBuilder> newCallback = registry =>
             {
                 // Only do the additional registrations if we are still using a PooledLifetime.
-                if (regData.Lifetime is PooledLifetime)
-                {
-                    var pooledInstanceService = new UniqueService();
-
-                    var instanceActivator = registration.ActivatorData.Activator;
-
-                    if (registration.ResolvePipeline.Middleware.Any(c => c.ToString() == nameof(Autofac.RegistrationExtensions.OnRelease)))
-                    {
-                        // OnRelease shouldn't be used with pooled instances, because if a policy chooses not to return them to the pool,
-                        // the Disposal will be fired, not the OnRelease call; this means that OnRelease wouldn't fire until the container is disposed,
-                        // which is not what we want.
-                        throw new NotSupportedException(RegistrationExtensionsResources.OnReleaseNotSupported);
-                    }
-
-                    // First, we going to create a pooled instance activator, that will be resolved when we want to
-                    // **actually** resolve a new instance (during 'Create').
-                    // The instances themselves are owned by the pool, and will be disposed when the pool disposes
-                    // (or when the instance is not returned to the pool).
-                    var pooledInstanceRegistration = new ComponentRegistration(
-                        Guid.NewGuid(),
-                        instanceActivator,
-                        RootScopeLifetime.Instance,
-                        InstanceSharing.None,
-                        InstanceOwnership.ExternallyOwned,
-                        registration.ResolvePipeline,
-                        new[] { pooledInstanceService },
-                        new Dictionary<string, object?>());
-
-                    registry.Register(pooledInstanceRegistration);
-
-                    var poolService = new PoolService(pooledInstanceRegistration);
-
-                    var poolRegistration = new ComponentRegistration(
-                        Guid.NewGuid(),
-                        new PoolActivator<TLimit>(pooledInstanceService, registrationPolicy),
-                        RootScopeLifetime.Instance,
-                        InstanceSharing.Shared,
-                        InstanceOwnership.OwnedByLifetimeScope,
-                        new[] { poolService },
-                        new Dictionary<string, object?>());
-
-                    registry.Register(poolRegistration);
-
-                    var pooledGetLifetime = tags is null ? CurrentScopeLifetime.Instance : new MatchingScopeLifetime(tags);
-
-                    // Next, create a new registration with a custom activator, that copies metadata and services from
-                    // the original registration. This registration will access the pool and return an instance from it.
-                    var poolGetRegistration = new ComponentRegistration(
-                        Guid.NewGuid(),
-                        new PoolGetActivator<TLimit>(poolService, registrationPolicy),
-                        pooledGetLifetime,
-                        InstanceSharing.Shared,
-                        InstanceOwnership.OwnedByLifetimeScope,
-                        regData.Services,
-                        regData.Metadata);
-
-                    registry.Register(poolGetRegistration);
-
-                    // Finally, add a service pipeline stage to just before the sharing middleware, for each supported service, to extract the pooled instance from the pool instance container.
-                    foreach (var srv in regData.Services)
-                    {
-                        registry.RegisterServiceMiddleware(srv, new PooledInstanceUnpackMiddleware<TLimit>(), MiddlewareInsertionMode.StartOfPhase);
-                    }
-                }
-                else
+                if (!(regData.Lifetime is PooledLifetime))
                 {
                     original(registry);
+                    return;
+                }
+
+                var pooledInstanceService = new UniqueService();
+
+                var instanceActivator = registration.ActivatorData.Activator;
+
+                if (registration.ResolvePipeline.Middleware.Any(c => c.ToString() == nameof(Autofac.RegistrationExtensions.OnRelease)))
+                {
+                    // OnRelease shouldn't be used with pooled instances, because if a policy chooses not to return them to the pool,
+                    // the Disposal will be fired, not the OnRelease call; this means that OnRelease wouldn't fire until the container is disposed,
+                    // which is not what we want.
+                    throw new NotSupportedException(RegistrationExtensionsResources.OnReleaseNotSupported);
+                }
+
+                // First, we going to create a pooled instance activator, that will be resolved when we want to
+                // **actually** resolve a new instance (during 'Create').
+                // The instances themselves are owned by the pool, and will be disposed when the pool disposes
+                // (or when the instance is not returned to the pool).
+                var pooledInstanceRegistration = new ComponentRegistration(
+                    Guid.NewGuid(),
+                    instanceActivator,
+                    RootScopeLifetime.Instance,
+                    InstanceSharing.None,
+                    InstanceOwnership.ExternallyOwned,
+                    registration.ResolvePipeline,
+                    new[] { pooledInstanceService },
+                    new Dictionary<string, object?>());
+
+                registry.Register(pooledInstanceRegistration);
+
+                var poolService = new PoolService(pooledInstanceRegistration);
+
+                var poolRegistration = new ComponentRegistration(
+                    Guid.NewGuid(),
+                    new PoolActivator<TLimit>(pooledInstanceService, registrationPolicy),
+                    RootScopeLifetime.Instance,
+                    InstanceSharing.Shared,
+                    InstanceOwnership.OwnedByLifetimeScope,
+                    new[] { poolService },
+                    new Dictionary<string, object?>());
+
+                registry.Register(poolRegistration);
+
+                var pooledGetLifetime = tags is null ? CurrentScopeLifetime.Instance : new MatchingScopeLifetime(tags);
+
+                // Next, create a new registration with a custom activator, that copies metadata and services from
+                // the original registration. This registration will access the pool and return an instance from it.
+                var poolGetRegistration = new ComponentRegistration(
+                    Guid.NewGuid(),
+                    new PoolGetActivator<TLimit>(poolService, registrationPolicy),
+                    pooledGetLifetime,
+                    InstanceSharing.Shared,
+                    InstanceOwnership.OwnedByLifetimeScope,
+                    regData.Services,
+                    regData.Metadata);
+
+                registry.Register(poolGetRegistration);
+
+                // Finally, add a service pipeline stage to just before the sharing middleware, for each supported service, to extract the pooled instance from the pool instance container.
+                foreach (var srv in regData.Services)
+                {
+                    registry.RegisterServiceMiddleware(srv, new PooledInstanceUnpackMiddleware<TLimit>(), MiddlewareInsertionMode.StartOfPhase);
                 }
             };
 

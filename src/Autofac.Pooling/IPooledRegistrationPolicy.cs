@@ -14,7 +14,7 @@ namespace Autofac.Pooling
     {
         /// <summary>
         /// Gets a value indicating the maximum number of items that will be retained in the pool. This is not a limit on the number of
-        /// objects that can be created, it's the threshold past which any objects returned to the pool will be discarded..
+        /// objects that can be created, it's the threshold past which any objects returned to the pool will be discarded.
         /// </summary>
         int MaximumRetained { get; }
 

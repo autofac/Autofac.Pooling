@@ -16,7 +16,7 @@ namespace Autofac.Pooling
     public static class RegistrationExtensions
     {
         /// <summary>
-        /// Configure the component so that every dependent component or call to Resolve() within a single <see cref="ILifetimeScope"/>
+        /// Configure the component so that every dependent component or manual resolve within a single <see cref="ILifetimeScope"/>
         /// will return the same, shared instance, retrieved from a single pool of instances shared by all lifetime scopes.
         /// When the scope ends, the instance will be returned to the pool.
         /// </summary>
@@ -54,7 +54,7 @@ namespace Autofac.Pooling
         }
 
         /// <summary>
-        /// Configure the component so that every dependent component or call to Resolve() within a single <see cref="ILifetimeScope"/>
+        /// Configure the component so that every dependent component or manual resolve within a single <see cref="ILifetimeScope"/>
         /// will return the same, shared instance, retrieved from a single pool of instances shared by all lifetime scopes.
         /// When the scope ends, the instance will be returned to the pool.
         /// </summary>
@@ -94,7 +94,7 @@ namespace Autofac.Pooling
         }
 
         /// <summary>
-        /// Configure the component so that every dependent component or call to Resolve() within a single <see cref="ILifetimeScope"/>
+        /// Configure the component so that every dependent component or manual resolve within a single <see cref="ILifetimeScope"/>
         /// will return the same, shared instance, retrieved from a single pool of instances shared by all lifetime scopes.
         /// When the scope ends, the instance will be returned to the pool.
         /// </summary>
@@ -135,7 +135,7 @@ namespace Autofac.Pooling
         }
 
         /// <summary>
-        /// Configure the component so that every dependent component or call to Resolve() within
+        /// Configure the component so that every dependent component or manual resolve within
         /// a <see cref="ILifetimeScope"/> tagged with any of the provided tags value gets the same, shared instance,
         /// retrieved from a single pool of instances shared by all lifetime scopes.
         /// When the scope ends, the instance will be returned to the pool.
@@ -179,7 +179,7 @@ namespace Autofac.Pooling
         }
 
         /// <summary>
-        /// Configure the component so that every dependent component or call to Resolve() within
+        /// Configure the component so that every dependent component or manual resolve within
         /// a <see cref="ILifetimeScope"/> tagged with any of the provided tags value gets the same, shared instance,
         /// retrieved from a single pool of instances shared by all lifetime scopes.
         /// When the scope ends, the instance will be returned to the pool.
@@ -225,7 +225,7 @@ namespace Autofac.Pooling
         }
 
         /// <summary>
-        /// Configure the component so that every dependent component or call to Resolve() within
+        /// Configure the component so that every dependent component or manual resolve within
         /// a <see cref="ILifetimeScope"/> tagged with any of the provided tags value gets the same, shared instance,
         /// retrieved from a single pool of instances shared by all lifetime scopes.
         /// When the scope ends, the instance will be returned to the pool.

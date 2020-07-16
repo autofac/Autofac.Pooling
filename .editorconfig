@@ -13,6 +13,18 @@ indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 
+; Force VS to recommend underscore at the start of created private fields.
+[*.{cs,vb}]
+dotnet_naming_rule.private_members_with_underscore.symbols  = private_fields
+dotnet_naming_rule.private_members_with_underscore.style    = prefix_underscore
+dotnet_naming_rule.private_members_with_underscore.severity = suggestion
+
+dotnet_naming_symbols.private_fields.applicable_kinds           = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+
+dotnet_naming_style.prefix_underscore.capitalization = camel_case
+dotnet_naming_style.prefix_underscore.required_prefix = _
+
 [*.{proj,props,sln,targets}]
 indent_style = tab
 trim_trailing_whitespace = true

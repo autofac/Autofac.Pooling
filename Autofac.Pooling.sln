@@ -8,6 +8,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
+		build\Analyzers.ruleset = build\Analyzers.ruleset
+		appveyor.yml = appveyor.yml
 		Autofac.snk = Autofac.snk
 		build.ps1 = build.ps1
 		CODE_OF_CONDUCT.md = CODE_OF_CONDUCT.md
@@ -18,9 +20,35 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{45B2D8D2-339F-4CA7-AD60-B5755B3F09DE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Autofac.Pooling", "src\Autofac.Pooling\Autofac.Pooling.csproj", "{A2327250-D640-4184-93A9-9465BAAB6E3D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{601EEBDE-152D-44DB-9F4E-225F4F2AB129}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Autofac.Pooling.Tests", "test\Autofac.Pooling.Tests\Autofac.Pooling.Tests.csproj", "{C248FC1D-F1E5-4A22-B8E6-5788D41D93E0}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A2327250-D640-4184-93A9-9465BAAB6E3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2327250-D640-4184-93A9-9465BAAB6E3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2327250-D640-4184-93A9-9465BAAB6E3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2327250-D640-4184-93A9-9465BAAB6E3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C248FC1D-F1E5-4A22-B8E6-5788D41D93E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C248FC1D-F1E5-4A22-B8E6-5788D41D93E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C248FC1D-F1E5-4A22-B8E6-5788D41D93E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C248FC1D-F1E5-4A22-B8E6-5788D41D93E0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A2327250-D640-4184-93A9-9465BAAB6E3D} = {45B2D8D2-339F-4CA7-AD60-B5755B3F09DE}
+		{C248FC1D-F1E5-4A22-B8E6-5788D41D93E0} = {601EEBDE-152D-44DB-9F4E-225F4F2AB129}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {22E71C8C-1CCC-4AD2-92D1-E3633CF6DFA4}

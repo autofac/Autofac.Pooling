@@ -28,7 +28,8 @@ namespace Autofac.Pooling
         /// </para>
         ///
         /// <para>
-        /// If the maximum pool capacity has been reached (or a custom <see cref="IPooledRegistrationPolicy{T}"/> , this method will be invoked, but then the object will not be put back in
+        /// If the maximum pool capacity has been reached (or a custom <see cref="IPooledRegistrationPolicy{T}"/> decides not to return the instance to the pool),
+        /// this method will be invoked, but then the object will not be put back in
         /// the pool (and may be disposed if the component implements <see cref="IDisposable"/>).
         /// </para>
         /// </summary>

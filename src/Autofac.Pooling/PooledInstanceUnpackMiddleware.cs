@@ -17,7 +17,7 @@ namespace Autofac.Pooling
         public PipelinePhase Phase => PipelinePhase.Sharing;
 
         /// <inheritdoc/>
-        public void Execute(ResolveRequestContextBase context, Action<ResolveRequestContextBase> next)
+        public void Execute(ResolveRequestContext context, Action<ResolveRequestContext> next)
         {
             next(context);
 

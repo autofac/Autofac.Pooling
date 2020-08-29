@@ -9,6 +9,7 @@ using Autofac.Core;
 using Autofac.Core.Activators.ProvidedInstance;
 using Autofac.Core.Lifetime;
 using Autofac.Core.Registration;
+using Autofac.Core.Resolving.Middleware;
 using Autofac.Core.Resolving.Pipeline;
 
 namespace Autofac.Pooling
@@ -321,7 +322,7 @@ namespace Autofac.Pooling
 
                 var instanceActivator = registration.ActivatorData.Activator;
 
-                if (registration.ResolvePipeline.Middleware.Any(c => c.ToString() == nameof(Autofac.RegistrationExtensions.OnRelease)))
+                if (registration.ResolvePipeline.Middleware.Any(c => c is CoreEventMiddleware ev && ev.EventType == ResolveEventType.OnRelease))
                 {
                     // OnRelease shouldn't be used with pooled instances, because if a policy chooses not to return them to the pool,
                     // the Disposal will be fired, not the OnRelease call; this means that OnRelease wouldn't fire until the container is disposed,

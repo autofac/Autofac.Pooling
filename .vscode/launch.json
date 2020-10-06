@@ -1,0 +1,23 @@
+{
+  "configurations": [
+    {
+      "args": [
+      ],
+      "console": "internalConsole",
+      "cwd": "${workspaceFolder}/test/Autofac.Pooling.Tests",
+      "name": ".NET Core Launch (console)",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/test/Autofac.Pooling.Tests/bin/Debug/netcoreapp3.1/Autofac.Pooling.TestsP.dll",
+      "request": "launch",
+      "stopAtEntry": false,
+      "type": "coreclr"
+    },
+    {
+      "name": ".NET Core Attach",
+      "processId": "${command:pickProcess}",
+      "request": "attach",
+      "type": "coreclr"
+    }
+  ],
+  "version": "0.2.0"
+}

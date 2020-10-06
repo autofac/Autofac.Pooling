@@ -12,8 +12,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		appveyor.yml = appveyor.yml
 		Autofac.snk = Autofac.snk
 		build.ps1 = build.ps1
-		CODE_OF_CONDUCT.md = CODE_OF_CONDUCT.md
-		CONTRIBUTING.md = CONTRIBUTING.md
 		global.json = global.json
 		LICENSE = LICENSE
 		NuGet.Config = NuGet.Config
@@ -26,7 +24,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Autofac.Pooling", "src\Auto
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{601EEBDE-152D-44DB-9F4E-225F4F2AB129}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Autofac.Pooling.Tests", "test\Autofac.Pooling.Tests\Autofac.Pooling.Tests.csproj", "{C248FC1D-F1E5-4A22-B8E6-5788D41D93E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Autofac.Pooling.Test", "test\Autofac.Pooling.Test\Autofac.Pooling.Test.csproj", "{C248FC1D-F1E5-4A22-B8E6-5788D41D93E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

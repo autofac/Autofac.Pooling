@@ -3,7 +3,7 @@ using Autofac.Pooling.Tests.Shared;
 using System;
 using Xunit;
 
-namespace Autofac.Pooling.Tests
+namespace Autofac.Pooling.Test
 {
     public class RegistrationExtensionsTests
     {

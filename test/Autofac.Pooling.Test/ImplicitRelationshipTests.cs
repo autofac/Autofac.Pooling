@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using Xunit;
 
-namespace Autofac.Pooling.Tests
+namespace Autofac.Pooling.Test
 {
     public class ImplicitRelationshipTests
     {
@@ -220,7 +220,7 @@ namespace Autofac.Pooling.Tests
             Assert.Equal(0, otherTrackingPolicy.OutOfPoolCount);
 
             container.Dispose();
-        } 
+        }
 
         [Fact]
         public void CanResolveCollectionOfTwoDifferentPoolsOfSameLimitType()

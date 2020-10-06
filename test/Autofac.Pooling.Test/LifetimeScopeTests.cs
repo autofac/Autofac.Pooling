@@ -2,7 +2,7 @@
 using Autofac.Pooling.Tests.Shared;
 using Xunit;
 
-namespace Autofac.Pooling.Tests
+namespace Autofac.Pooling.Test
 {
     public class LifetimeScopeTests
     {

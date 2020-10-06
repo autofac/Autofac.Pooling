@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Autofac.Pooling.Tests
 {
-    public class PoolingTests
+    public class PoolingTest
     {
         [Fact]
         public void CanRegisterPooledService()

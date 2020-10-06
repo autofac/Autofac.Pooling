@@ -3,6 +3,7 @@
 
 # Project specific files
 artifacts/
+BenchmarkDotNet.Artifacts/
 
 # User-specific files
 *.suo
@@ -22,7 +23,6 @@ x64/
 # Visual Studio 2015 cache/options directory
 .dotnet/
 .vs/
-.vscode/
 .cr/
 
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
@@ -123,8 +123,6 @@ AppPackages/
 sql/
 *.Cache
 ClientBin/
-[Ss]tyle[Cc]op.*
-!stylecop.json
 ~$*
 *~
 *.dbmdl
@@ -166,5 +164,5 @@ $RECYCLE.BIN/
 # Mac crap
 .DS_Store
 
-# JetBrains Rider crap
+# JetBrains Rider
 .idea

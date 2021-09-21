@@ -1,6 +1,6 @@
 # Autofac.Pooling
 
-[![Build status](https://ci.appveyor.com/api/projects/status/8lvj9casnf84h2u8?svg=true)](https://ci.appveyor.com/project/Autofac/autofac-pooling)
+[![Build status](https://ci.appveyor.com/api/projects/status/8lvj9casnf84h2u8?svg=true)](https://ci.appveyor.com/project/Autofac/autofac-pooling) [![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/autofac/Autofac.Pooling)
 
 Support for pooled instance lifetime scopes in Autofac dependency injection.
 

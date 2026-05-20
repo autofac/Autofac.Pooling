@@ -1,8 +1,8 @@
-﻿using Autofac.Features.Metadata;
+﻿using System;
+using System.Collections.Generic;
+using Autofac.Features.Metadata;
 using Autofac.Features.OwnedInstances;
 using Autofac.Pooling.Tests.Shared;
-using System;
-using System.Collections.Generic;
 using Xunit;
 
 namespace Autofac.Pooling.Test

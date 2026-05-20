@@ -1,6 +1,6 @@
-﻿using Autofac.Builder;
+﻿using System;
+using Autofac.Builder;
 using Autofac.Pooling.Tests.Shared;
-using System;
 using Xunit;
 
 namespace Autofac.Pooling.Test

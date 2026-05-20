@@ -1,7 +1,7 @@
-﻿using Autofac.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using Autofac.Core;
 
 namespace Autofac.Pooling.Tests.Shared
 {

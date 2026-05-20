@@ -41,14 +41,14 @@ using (var scope = container.BeginLifetimeScope())
 
 using (var scope2 = container.BeginLifetimeScope())
 {
-    // Does **not** create a new instance, but instead gets the 
+    // Does **not** create a new instance, but instead gets the
     // previous instance from the pool.
     var instance = scope.Resolve<ICustomConnection>();
 
     instance.DoSomething();
 }
 
-// Instance gets returned back to the pool again at the 
+// Instance gets returned back to the pool again at the
 // end of the lifetime scope.
 ```
 

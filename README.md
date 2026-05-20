@@ -1,6 +1,6 @@
 # Autofac.Pooling
 
-[![Build status](https://ci.appveyor.com/api/projects/status/8lvj9casnf84h2u8?svg=true)](https://ci.appveyor.com/project/Autofac/autofac-pooling) [![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/autofac/Autofac.Pooling)
+[![Build status](https://github.com/autofac/Autofac.Pooling/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/autofac/Autofac.Pooling/actions/workflows/ci.yml) [![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/autofac/Autofac.Pooling)
 
 Support for pooled instance lifetime scopes in Autofac dependency injection.
 
@@ -41,14 +41,14 @@ using (var scope = container.BeginLifetimeScope())
 
 using (var scope2 = container.BeginLifetimeScope())
 {
-    // Does **not** create a new instance, but instead gets the 
+    // Does **not** create a new instance, but instead gets the
     // previous instance from the pool.
     var instance = scope.Resolve<ICustomConnection>();
 
     instance.DoSomething();
 }
 
-// Instance gets returned back to the pool again at the 
+// Instance gets returned back to the pool again at the
 // end of the lifetime scope.
 ```
 

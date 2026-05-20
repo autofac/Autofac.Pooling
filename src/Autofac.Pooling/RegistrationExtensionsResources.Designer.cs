@@ -10,8 +10,8 @@
 
 namespace Autofac.Pooling {
     using System;
-    
-    
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -23,15 +23,15 @@ namespace Autofac.Pooling {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class RegistrationExtensionsResources {
-        
+
         private static global::System.Resources.ResourceManager resourceMan;
-        
+
         private static global::System.Globalization.CultureInfo resourceCulture;
-        
+
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal RegistrationExtensionsResources() {
         }
-        
+
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
@@ -45,7 +45,7 @@ namespace Autofac.Pooling {
                 return resourceMan;
             }
         }
-        
+
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
@@ -59,7 +59,7 @@ namespace Autofac.Pooling {
                 resourceCulture = value;
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Pooled registrations cannot be used with provided instances. Use a typed registration or a delegate registration instead..
         /// </summary>
@@ -68,7 +68,7 @@ namespace Autofac.Pooling {
                 return ResourceManager.GetString("CannotUseProvidedInstances", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to It is not possible to use custom OnRelease events for pooled registrations. Instead, either provide a custom IPooledRegistrationPolicy to handle items being returned to pool, or implement IPooledComponent on the component&apos;s type..
         /// </summary>
@@ -77,7 +77,7 @@ namespace Autofac.Pooling {
                 return ResourceManager.GetString("OnReleaseNotSupported", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to You can only specified a pooled registration for registrations that have a callback container attached (e.g., one that was made with a standard ContainerBuilder extension method)..
         /// </summary>

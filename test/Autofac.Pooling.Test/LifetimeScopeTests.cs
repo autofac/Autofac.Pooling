@@ -2,124 +2,123 @@
 using Autofac.Pooling.Tests.Shared;
 using Xunit;
 
-namespace Autofac.Pooling.Test
+namespace Autofac.Pooling.Test;
+
+public class LifetimeScopeTests
 {
-    public class LifetimeScopeTests
+    [Fact]
+    public void EachNestedScopeGetsOwnInstanceFromPool()
     {
-        [Fact]
-        public void EachNestedScopeGetsOwnInstanceFromPool()
+        var builder = new ContainerBuilder();
+
+        var tracking = new PoolTrackingPolicy<PooledComponent>();
+
+        builder.RegisterType<PooledComponent>().As<IPooledService>().PooledInstancePerLifetimeScope(tracking);
+
+        var container = builder.Build();
+
+        using (var scope = container.BeginLifetimeScope())
         {
-            var builder = new ContainerBuilder();
+            var outerInstance = scope.Resolve<IPooledService>();
 
-            var tracking = new PoolTrackingPolicy<PooledComponent>();
+            Assert.Equal(1, tracking.OutOfPoolCount);
 
-            builder.RegisterType<PooledComponent>().As<IPooledService>().PooledInstancePerLifetimeScope(tracking);
-
-            var container = builder.Build();
-
-            using (var scope = container.BeginLifetimeScope())
+            using (var innerScope = scope.BeginLifetimeScope())
             {
-                var outerInstance = scope.Resolve<IPooledService>();
+                var innerInstance = innerScope.Resolve<IPooledService>();
 
-                Assert.Equal(1, tracking.OutOfPoolCount);
+                Assert.Equal(2, tracking.OutOfPoolCount);
 
-                using (var innerScope = scope.BeginLifetimeScope())
-                {
-                    var innerInstance = innerScope.Resolve<IPooledService>();
-
-                    Assert.Equal(2, tracking.OutOfPoolCount);
-
-                    Assert.NotSame(outerInstance, innerInstance);
-                }
-
-                Assert.Equal(1, tracking.OutOfPoolCount);
+                Assert.NotSame(outerInstance, innerInstance);
             }
 
-            Assert.Equal(0, tracking.OutOfPoolCount);
+            Assert.Equal(1, tracking.OutOfPoolCount);
         }
 
-        [Fact]
-        public void MatchingScopeSharesPooledInstanceWithNestedScopes()
+        Assert.Equal(0, tracking.OutOfPoolCount);
+    }
+
+    [Fact]
+    public void MatchingScopeSharesPooledInstanceWithNestedScopes()
+    {
+        var builder = new ContainerBuilder();
+
+        var tracking = new PoolTrackingPolicy<PooledComponent>();
+
+        builder.RegisterType<PooledComponent>().As<IPooledService>().PooledInstancePerMatchingLifetimeScope(tracking, "tag");
+
+        var container = builder.Build();
+
+        using (var scope = container.BeginLifetimeScope("tag"))
         {
-            var builder = new ContainerBuilder();
+            var outerInstance = scope.Resolve<IPooledService>();
 
-            var tracking = new PoolTrackingPolicy<PooledComponent>();
+            Assert.Equal(1, tracking.OutOfPoolCount);
 
-            builder.RegisterType<PooledComponent>().As<IPooledService>().PooledInstancePerMatchingLifetimeScope(tracking, "tag");
-
-            var container = builder.Build();
-
-            using (var scope = container.BeginLifetimeScope("tag"))
+            using (var innerScope = scope.BeginLifetimeScope())
             {
-                var outerInstance = scope.Resolve<IPooledService>();
+                var innerInstance = innerScope.Resolve<IPooledService>();
 
                 Assert.Equal(1, tracking.OutOfPoolCount);
 
-                using (var innerScope = scope.BeginLifetimeScope())
-                {
-                    var innerInstance = innerScope.Resolve<IPooledService>();
-
-                    Assert.Equal(1, tracking.OutOfPoolCount);
-
-                    Assert.Same(outerInstance, innerInstance);
-                }
-
-                Assert.Equal(1, tracking.OutOfPoolCount);
+                Assert.Same(outerInstance, innerInstance);
             }
 
-            Assert.Equal(0, tracking.OutOfPoolCount);
+            Assert.Equal(1, tracking.OutOfPoolCount);
         }
 
-        [Fact]
-        public void MatchingScopeNotFoundErrorThrownWithPooledRegistration()
+        Assert.Equal(0, tracking.OutOfPoolCount);
+    }
+
+    [Fact]
+    public void MatchingScopeNotFoundErrorThrownWithPooledRegistration()
+    {
+        var builder = new ContainerBuilder();
+
+        builder.RegisterType<PooledComponent>().As<IPooledService>().PooledInstancePerMatchingLifetimeScope("tag");
+
+        var container = builder.Build();
+
+        using var scope = container.BeginLifetimeScope();
+
+        Assert.Throws<DependencyResolutionException>(() => scope.Resolve<IPooledService>());
+    }
+
+    [Fact]
+    public void PoolCanBeOverriddenInNestedScope()
+    {
+        var builder = new ContainerBuilder();
+
+        var outerPolicy = new PoolTrackingPolicy<PooledComponent>();
+        var innerPolicy = new PoolTrackingPolicy<PooledComponent>();
+
+        builder.RegisterType<PooledComponent>().As<IPooledService>().PooledInstancePerLifetimeScope(outerPolicy);
+
+        var container = builder.Build();
+
+        using (var scope = container.BeginLifetimeScope())
         {
-            var builder = new ContainerBuilder();
+            var outerInstance = scope.Resolve<IPooledService>();
 
-            builder.RegisterType<PooledComponent>().As<IPooledService>().PooledInstancePerMatchingLifetimeScope("tag");
+            Assert.Equal(1, outerPolicy.OutOfPoolCount);
 
-            var container = builder.Build();
-
-            using var scope = container.BeginLifetimeScope();
-
-            Assert.Throws<DependencyResolutionException>(() => scope.Resolve<IPooledService>());
-        }
-
-        [Fact]
-        public void PoolCanBeOverriddenInNestedScope()
-        {
-            var builder = new ContainerBuilder();
-
-            var outerPolicy = new PoolTrackingPolicy<PooledComponent>();
-            var innerPolicy = new PoolTrackingPolicy<PooledComponent>();
-
-            builder.RegisterType<PooledComponent>().As<IPooledService>().PooledInstancePerLifetimeScope(outerPolicy);
-
-            var container = builder.Build();
-
-            using (var scope = container.BeginLifetimeScope())
+            using (var overrideScope = scope.BeginLifetimeScope(cfg =>
             {
-                var outerInstance = scope.Resolve<IPooledService>();
+                cfg.RegisterType<PooledComponent>().As<IPooledService>().PooledInstancePerLifetimeScope(innerPolicy);
+            }))
+            {
+                var innerInstance = overrideScope.Resolve<IPooledService>();
 
                 Assert.Equal(1, outerPolicy.OutOfPoolCount);
+                Assert.Equal(1, innerPolicy.OutOfPoolCount);
 
-                using (var overrideScope = scope.BeginLifetimeScope(cfg =>
-                {
-                    cfg.RegisterType<PooledComponent>().As<IPooledService>().PooledInstancePerLifetimeScope(innerPolicy);
-                }))
-                {
-                    var innerInstance = overrideScope.Resolve<IPooledService>();
-
-                    Assert.Equal(1, outerPolicy.OutOfPoolCount);
-                    Assert.Equal(1, innerPolicy.OutOfPoolCount);
-
-                    Assert.NotSame(outerInstance, innerInstance);
-                }
-
-                Assert.Equal(0, innerPolicy.OutOfPoolCount);
-                Assert.Equal(1, outerPolicy.OutOfPoolCount);
+                Assert.NotSame(outerInstance, innerInstance);
             }
 
-            Assert.Equal(0, outerPolicy.OutOfPoolCount);
+            Assert.Equal(0, innerPolicy.OutOfPoolCount);
+            Assert.Equal(1, outerPolicy.OutOfPoolCount);
         }
+
+        Assert.Equal(0, outerPolicy.OutOfPoolCount);
     }
 }

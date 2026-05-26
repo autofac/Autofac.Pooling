@@ -1,11 +1,19 @@
-﻿namespace Autofac.Pooling.Tests.Shared
+﻿namespace Autofac.Pooling.Tests.Shared;
+
+public interface IPooledService
 {
-    public interface IPooledService
+    int GetCalled
     {
-        int GetCalled { get; }
+        get;
+    }
 
-        int ReturnCalled { get; }
+    int ReturnCalled
+    {
+        get;
+    }
 
-        int DisposeCalled { get; }
+    int DisposeCalled
+    {
+        get;
     }
 }

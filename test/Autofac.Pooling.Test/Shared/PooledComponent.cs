@@ -2,29 +2,37 @@
 using System.Collections.Generic;
 using Autofac.Core;
 
-namespace Autofac.Pooling.Tests.Shared
+namespace Autofac.Pooling.Tests.Shared;
+
+public class PooledComponent : IPooledService, IPooledComponent, IDisposable
 {
-    public class PooledComponent : IPooledService, IPooledComponent, IDisposable
+    public int GetCalled
     {
-        public int GetCalled { get; private set; }
+        get; private set;
+    }
 
-        public int ReturnCalled { get; private set; }
+    public int ReturnCalled
+    {
+        get; private set;
+    }
 
-        public int DisposeCalled { get; private set; }
+    public int DisposeCalled
+    {
+        get; private set;
+    }
 
-        public void OnGetFromPool(IComponentContext ctxt, IEnumerable<Parameter> parameters)
-        {
-            GetCalled++;
-        }
+    public void OnGetFromPool(IComponentContext ctxt, IEnumerable<Parameter> parameters)
+    {
+        GetCalled++;
+    }
 
-        public void OnReturnToPool()
-        {
-            ReturnCalled++;
-        }
+    public void OnReturnToPool()
+    {
+        ReturnCalled++;
+    }
 
-        public void Dispose()
-        {
-            DisposeCalled++;
-        }
+    public void Dispose()
+    {
+        DisposeCalled++;
     }
 }

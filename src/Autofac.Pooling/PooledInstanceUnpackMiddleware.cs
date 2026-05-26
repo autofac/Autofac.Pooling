@@ -4,28 +4,27 @@
 using System;
 using Autofac.Core.Resolving.Pipeline;
 
-namespace Autofac.Pooling
+namespace Autofac.Pooling;
+
+/// <summary>
+/// Middleware for extracting the requested instance from the pool instance container.
+/// </summary>
+/// <typeparam name="TLimit">The limit type of the registration that has been pooled.</typeparam>
+internal sealed class PooledInstanceUnpackMiddleware<TLimit> : IResolveMiddleware
+    where TLimit : class
 {
-    /// <summary>
-    /// Middleware for extracting the requested instance from the pool instance container.
-    /// </summary>
-    /// <typeparam name="TLimit">The limit type of the registration that has been pooled.</typeparam>
-    internal sealed class PooledInstanceUnpackMiddleware<TLimit> : IResolveMiddleware
-        where TLimit : class
+    /// <inheritdoc/>
+    public PipelinePhase Phase => PipelinePhase.Sharing;
+
+    /// <inheritdoc/>
+    public void Execute(ResolveRequestContext context, Action<ResolveRequestContext> next)
     {
-        /// <inheritdoc/>
-        public PipelinePhase Phase => PipelinePhase.Sharing;
+        next(context);
 
-        /// <inheritdoc/>
-        public void Execute(ResolveRequestContext context, Action<ResolveRequestContext> next)
+        // 'Unpack' the pool instance so what the consumer sees is just the implementation.
+        if (context.Instance is PooledInstanceTracker<TLimit> poolInstanceContainer)
         {
-            next(context);
-
-            // 'Unpack' the pool instance so what the consumer sees is just the implementation.
-            if (context.Instance is PooledInstanceTracker<TLimit> poolInstanceContainer)
-            {
-                context.Instance = poolInstanceContainer.Instance;
-            }
+            context.Instance = poolInstanceContainer.Instance;
         }
     }
 }

@@ -3,39 +3,38 @@ using Autofac.Builder;
 using Autofac.Pooling.Tests.Shared;
 using Xunit;
 
-namespace Autofac.Pooling.Test
+namespace Autofac.Pooling.Test;
+
+public class RegistrationExtensionsTests
 {
-    public class RegistrationExtensionsTests
+    [Fact]
+    public void RequiresCallbackContainer()
     {
-        [Fact]
-        public void RequiresCallbackContainer()
-        {
-            // Manually create a registration builder, then call AsPooled
-            var regBuilder = RegistrationBuilder.ForType<PooledComponent>();
+        // Manually create a registration builder, then call AsPooled
+        var regBuilder = RegistrationBuilder.ForType<PooledComponent>();
 
-            Assert.Throws<NotSupportedException>(() => regBuilder.PooledInstancePerLifetimeScope());
-        }
+        Assert.Throws<NotSupportedException>(() => regBuilder.PooledInstancePerLifetimeScope());
+    }
 
-        [Fact]
-        public void NoProvidedInstances()
-        {
-            var builder = new ContainerBuilder();
+    [Fact]
+    public void NoProvidedInstances()
+    {
+        var builder = new ContainerBuilder();
 
-            var regBuilder = builder.RegisterInstance(new PooledComponent());
+        var regBuilder = builder.RegisterInstance(new PooledComponent());
 
-            Assert.Throws<NotSupportedException>(() => regBuilder.PooledInstancePerLifetimeScope());
-        }
+        Assert.Throws<NotSupportedException>(() => regBuilder.PooledInstancePerLifetimeScope());
+    }
 
-        [Fact]
-        public void OnReleaseNotCompatible()
-        {
-            var builder = new ContainerBuilder();
+    [Fact]
+    public void OnReleaseNotCompatible()
+    {
+        var builder = new ContainerBuilder();
 
-            builder.RegisterType<PooledComponent>()
-                   .PooledInstancePerLifetimeScope()
-                   .OnRelease(args => { });
+        builder.RegisterType<PooledComponent>()
+               .PooledInstancePerLifetimeScope()
+               .OnRelease(args => { });
 
-            Assert.Throws<NotSupportedException>(() => builder.Build());
-        }
+        Assert.Throws<NotSupportedException>(() => builder.Build());
     }
 }

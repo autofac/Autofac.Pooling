@@ -8,81 +8,80 @@ using Autofac.Core;
 using Autofac.Pooling.Tests.Shared;
 using Xunit;
 
-namespace Autofac.Pooling.Test
+namespace Autofac.Pooling.Test;
+
+public class ConcurrencyTests
 {
-    public class ConcurrencyTests
+    [Fact]
+    public async Task CanUsePoolConcurrently()
     {
-        [Fact]
-        public async Task CanUsePoolConcurrently()
+        var builder = new ContainerBuilder();
+
+        builder.RegisterType<PooledComponent>().As<IPooledService>()
+                                               .PooledInstancePerLifetimeScope();
+
+        var container = builder.Build();
+
+        await Task.WhenAll(Enumerable.Range(0, 2000).Select(i => Task.Run(() =>
         {
-            var builder = new ContainerBuilder();
+            using var scope = container.BeginLifetimeScope();
 
-            builder.RegisterType<PooledComponent>().As<IPooledService>()
-                                                   .PooledInstancePerLifetimeScope();
+            scope.Resolve<IPooledService>();
+        })));
 
-            var container = builder.Build();
+        container.Dispose();
+    }
 
-            await Task.WhenAll(Enumerable.Range(0, 2000).Select(i => Task.Run(() =>
-            {
-                using var scope = container.BeginLifetimeScope();
+    [Fact]
+    public async Task CanUsePoolConcurrentlyWithCustomPolicyToBlockOnMaxUsage()
+    {
+        var builder = new ContainerBuilder();
 
-                scope.Resolve<IPooledService>();
-            })));
+        var blockingPolicy = new BlockingPolicy<PooledComponent>(4);
 
-            container.Dispose();
+        builder.RegisterType<PooledComponent>().As<IPooledService>()
+                                               .PooledInstancePerLifetimeScope(blockingPolicy);
+
+        var container = builder.Build();
+
+        await Task.WhenAll(Enumerable.Range(0, 10000).Select(i => Task.Run(() =>
+        {
+            using var scope = container.BeginLifetimeScope();
+
+            scope.Resolve<IPooledService>();
+
+            Assert.InRange(blockingPolicy.InUseCount, 1, 4);
+        })));
+
+        container.Dispose();
+    }
+
+    private class BlockingPolicy<TLimit> : DefaultPooledRegistrationPolicy<TLimit>
+        where TLimit : class
+    {
+        private readonly SemaphoreSlim _semaphore;
+
+        public BlockingPolicy(int maxConcurrentInstances) : base(maxConcurrentInstances)
+        {
+            _semaphore = new SemaphoreSlim(maxConcurrentInstances);
         }
 
-        [Fact]
-        public async Task CanUsePoolConcurrentlyWithCustomPolicyToBlockOnMaxUsage()
+        public int InUseCount => MaximumRetained - _semaphore.CurrentCount;
+
+        public override TLimit Get(IComponentContext context, IEnumerable<Parameter> parameters, Func<TLimit> getFromPool)
         {
-            var builder = new ContainerBuilder();
+            _semaphore.Wait();
 
-            var blockingPolicy = new BlockingPolicy<PooledComponent>(4);
+            Assert.InRange(_semaphore.CurrentCount, 0, MaximumRetained);
 
-            builder.RegisterType<PooledComponent>().As<IPooledService>()
-                                                   .PooledInstancePerLifetimeScope(blockingPolicy);
-
-            var container = builder.Build();
-
-            await Task.WhenAll(Enumerable.Range(0, 10000).Select(i => Task.Run(() =>
-            {
-                using var scope = container.BeginLifetimeScope();
-
-                scope.Resolve<IPooledService>();
-
-                Assert.InRange(blockingPolicy.InUseCount, 1, 4);
-            })));
-
-            container.Dispose();
+            return base.Get(context, parameters, getFromPool);
         }
 
-        private class BlockingPolicy<TLimit> : DefaultPooledRegistrationPolicy<TLimit>
-            where TLimit : class
+        public override bool Return(TLimit pooledObject)
         {
-            private readonly SemaphoreSlim _semaphore;
+            _semaphore.Release();
 
-            public BlockingPolicy(int maxConcurrentInstances) : base(maxConcurrentInstances)
-            {
-                _semaphore = new SemaphoreSlim(maxConcurrentInstances);
-            }
-
-            public int InUseCount => MaximumRetained - _semaphore.CurrentCount;
-
-            public override TLimit Get(IComponentContext context, IEnumerable<Parameter> parameters, Func<TLimit> getFromPool)
-            {
-                _semaphore.Wait();
-
-                Assert.InRange(_semaphore.CurrentCount, 0, MaximumRetained);
-
-                return base.Get(context, parameters, getFromPool);
-            }
-
-            public override bool Return(TLimit pooledObject)
-            {
-                _semaphore.Release();
-
-                return base.Return(pooledObject);
-            }
+            return base.Return(pooledObject);
         }
     }
 }

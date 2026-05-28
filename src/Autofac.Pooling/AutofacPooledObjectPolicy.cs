@@ -10,7 +10,7 @@ namespace Autofac.Pooling;
 /// Provides the <see cref="IPooledObjectPolicy{TLimit}"/> needed for creating/returning objects in the pool in an Autofac way.
 /// </summary>
 /// <typeparam name="TPooledObject">The type of object being pooled.</typeparam>
-internal class AutofacPooledObjectPolicy<TPooledObject> : IPooledObjectPolicy<TPooledObject>
+internal sealed class AutofacPooledObjectPolicy<TPooledObject> : IPooledObjectPolicy<TPooledObject>
     where TPooledObject : class
 {
     private readonly Service _poolInstanceService;

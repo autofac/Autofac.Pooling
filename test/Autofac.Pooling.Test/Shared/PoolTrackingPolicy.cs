@@ -14,6 +14,8 @@ public class PoolTrackingPolicy<TLimit> : DefaultPooledRegistrationPolicy<TLimit
 
     public override TLimit Get(IComponentContext context, IEnumerable<Parameter> parameters, Func<TLimit> getFromPool)
     {
+        ArgumentNullException.ThrowIfNull(getFromPool);
+
         Interlocked.Increment(ref _outOfPool);
 
         return getFromPool();

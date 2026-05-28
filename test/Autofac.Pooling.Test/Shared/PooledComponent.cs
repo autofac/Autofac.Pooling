@@ -21,7 +21,7 @@ public class PooledComponent : IPooledService, IPooledComponent, IDisposable
         get; private set;
     }
 
-    public void OnGetFromPool(IComponentContext ctxt, IEnumerable<Parameter> parameters)
+    public void OnGetFromPool(IComponentContext context, IEnumerable<Parameter> parameters)
     {
         GetCalled++;
     }

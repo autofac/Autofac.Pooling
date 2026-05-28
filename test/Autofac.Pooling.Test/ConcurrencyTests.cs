@@ -22,14 +22,18 @@ public class ConcurrencyTests
 
         var container = builder.Build();
 
-        await Task.WhenAll(Enumerable.Range(0, 2000).Select(i => Task.Run(() =>
+        var exception = await Record.ExceptionAsync(async () =>
         {
-            using var scope = container.BeginLifetimeScope();
+            await Task.WhenAll(Enumerable.Range(0, 2000).Select(i => Task.Run(() =>
+            {
+                using var scope = container.BeginLifetimeScope();
 
-            scope.Resolve<IPooledService>();
-        })));
+                scope.Resolve<IPooledService>();
+            })));
 
-        container.Dispose();
+            container.Dispose();
+        });
+        Assert.Null(exception);
     }
 
     [Fact]

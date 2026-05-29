@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using Autofac.Core;
 
-namespace Autofac.Pooling.Tests.Shared;
+namespace Autofac.Pooling.Tests.Common;
 
+[SuppressMessage("CA1063", "CA1063", Justification = "Dispose remains simple here for testing.")]
 public class PooledComponent : IPooledService, IPooledComponent, IDisposable
 {
     public int GetCalled
@@ -21,7 +22,7 @@ public class PooledComponent : IPooledService, IPooledComponent, IDisposable
         get; private set;
     }
 
-    public void OnGetFromPool(IComponentContext ctxt, IEnumerable<Parameter> parameters)
+    public void OnGetFromPool(IComponentContext context, IEnumerable<Parameter> parameters)
     {
         GetCalled++;
     }
@@ -31,6 +32,7 @@ public class PooledComponent : IPooledService, IPooledComponent, IDisposable
         ReturnCalled++;
     }
 
+    [SuppressMessage("CA1063", "CA1063", Justification = "Dispose remains simple here for testing.")]
     public void Dispose()
     {
         DisposeCalled++;

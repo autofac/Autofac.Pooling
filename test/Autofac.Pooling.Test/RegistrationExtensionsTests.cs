@@ -1,6 +1,6 @@
 ﻿using System;
 using Autofac.Builder;
-using Autofac.Pooling.Tests.Shared;
+using Autofac.Pooling.Tests.Common;
 using Xunit;
 
 namespace Autofac.Pooling.Test;
@@ -17,6 +17,7 @@ public class RegistrationExtensionsTests
     }
 
     [Fact]
+    [SuppressMessage("CA2000", "CA2000", Justification = "The container will dispose of the object.")]
     public void NoProvidedInstances()
     {
         var builder = new ContainerBuilder();

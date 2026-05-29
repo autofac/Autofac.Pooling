@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Autofac.Features.Metadata;
 using Autofac.Features.OwnedInstances;
-using Autofac.Pooling.Tests.Shared;
+using Autofac.Pooling.Tests.Common;
 using Xunit;
 
 namespace Autofac.Pooling.Test;
@@ -237,7 +237,7 @@ public class ImplicitRelationshipTests
 
         using (var scope1 = container.BeginLifetimeScope())
         {
-            var set = scope1.Resolve<IList<IPooledService>>();
+            scope1.Resolve<IList<IPooledService>>();
 
             // The important point is that each pool goes up by one, meaning that we can track different pools
             // for the same limit type.

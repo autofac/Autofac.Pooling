@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac.Core;
-using Autofac.Pooling.Tests.Shared;
+using Autofac.Pooling.Tests.Common;
 using Xunit;
 
 namespace Autofac.Pooling.Test;
@@ -22,14 +22,18 @@ public class ConcurrencyTests
 
         var container = builder.Build();
 
-        await Task.WhenAll(Enumerable.Range(0, 2000).Select(i => Task.Run(() =>
+        var exception = await Record.ExceptionAsync(async () =>
         {
-            using var scope = container.BeginLifetimeScope();
+            await Task.WhenAll(Enumerable.Range(0, 2000).Select(i => Task.Run(() =>
+            {
+                using var scope = container.BeginLifetimeScope();
 
-            scope.Resolve<IPooledService>();
-        })));
+                scope.Resolve<IPooledService>();
+            })));
 
-        container.Dispose();
+            container.Dispose();
+        });
+        Assert.Null(exception);
     }
 
     [Fact]
@@ -37,7 +41,7 @@ public class ConcurrencyTests
     {
         var builder = new ContainerBuilder();
 
-        var blockingPolicy = new BlockingPolicy<PooledComponent>(4);
+        using var blockingPolicy = new BlockingPolicy<PooledComponent>(4);
 
         builder.RegisterType<PooledComponent>().As<IPooledService>()
                                                .PooledInstancePerLifetimeScope(blockingPolicy);
@@ -56,10 +60,11 @@ public class ConcurrencyTests
         container.Dispose();
     }
 
-    private class BlockingPolicy<TLimit> : DefaultPooledRegistrationPolicy<TLimit>
+    private class BlockingPolicy<TLimit> : DefaultPooledRegistrationPolicy<TLimit>, IDisposable
         where TLimit : class
     {
         private readonly SemaphoreSlim _semaphore;
+        private bool _disposedValue;
 
         public BlockingPolicy(int maxConcurrentInstances) : base(maxConcurrentInstances)
         {
@@ -82,6 +87,26 @@ public class ConcurrencyTests
             _semaphore.Release();
 
             return base.Return(pooledObject);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    _semaphore.Dispose();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

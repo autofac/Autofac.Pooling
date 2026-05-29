@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Autofac.Core;
 
-namespace Autofac.Pooling.Tests.Shared;
+namespace Autofac.Pooling.Tests.Common;
 
 public class PoolTrackingPolicy<TLimit> : DefaultPooledRegistrationPolicy<TLimit>
     where TLimit : class

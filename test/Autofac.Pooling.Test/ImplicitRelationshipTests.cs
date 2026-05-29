@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Autofac.Features.Metadata;
 using Autofac.Features.OwnedInstances;
-using Autofac.Pooling.Tests.Shared;
+using Autofac.Pooling.Tests.Common;
 using Xunit;
 
 namespace Autofac.Pooling.Test;

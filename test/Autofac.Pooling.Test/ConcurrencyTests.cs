@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Autofac.Core;
-using Autofac.Pooling.Tests.Shared;
+using Autofac.Pooling.Tests.Common;
 using Xunit;
 
 namespace Autofac.Pooling.Test;

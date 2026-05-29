@@ -1,4 +1,4 @@
-﻿namespace Autofac.Pooling.Tests.Shared;
+﻿namespace Autofac.Pooling.Tests.Common;
 
 public interface IPooledService
 {

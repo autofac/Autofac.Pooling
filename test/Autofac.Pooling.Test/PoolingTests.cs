@@ -1,4 +1,4 @@
-﻿using Autofac.Pooling.Tests.Shared;
+﻿using Autofac.Pooling.Tests.Common;
 using Xunit;
 
 namespace Autofac.Pooling.Tests;

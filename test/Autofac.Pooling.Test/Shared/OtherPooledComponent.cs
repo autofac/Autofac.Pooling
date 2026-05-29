@@ -2,9 +2,9 @@
 
 public class OtherPooledComponent : IPooledService
 {
-    public int GetCalled => throw new System.NotImplementedException();
+    public int GetCalled => 0;
 
-    public int ReturnCalled => throw new System.NotImplementedException();
+    public int ReturnCalled => 0;
 
-    public int DisposeCalled => throw new System.NotImplementedException();
+    public int DisposeCalled => 0;
 }

@@ -144,11 +144,9 @@ public class PolicyTests
 
         var container = builder.Build();
 
-        IPooledService pooledInstance;
-
         using (var scope = container.BeginLifetimeScope())
         {
-            pooledInstance = scope.Resolve<IPooledService>(new NamedParameter("Val1", 123), new TypedParameter(typeof(int), 456));
+            var _ = scope.Resolve<IPooledService>(new NamedParameter("Val1", 123), new TypedParameter(typeof(int), 456));
         }
 
         Assert.Collection(policyReceivedParameters,

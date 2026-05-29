@@ -2,20 +2,8 @@
   "tasks": [
     {
       "args": [
-        "watch",
-        "run",
-        "${workspaceFolder}/test/Autofac.Pooling.Tests/Autofac.Pooling.Tests.csproj",
-        "/property:GenerateFullPaths=true",
-        "/consoleloggerparameters:NoSummary"
-      ],
-      "command": "dotnet",
-      "label": "watch",
-      "problemMatcher": "$msCompile",
-      "type": "process"
-    },
-    {
-      "args": [
         "build",
+        "Autofac.Pooling.sln",
         "/property:GenerateFullPaths=true",
         "/consoleloggerparameters:NoSummary"
       ],

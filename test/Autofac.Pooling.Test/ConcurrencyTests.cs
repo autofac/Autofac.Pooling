@@ -41,7 +41,7 @@ public class ConcurrencyTests
     {
         var builder = new ContainerBuilder();
 
-        var blockingPolicy = new BlockingPolicy<PooledComponent>(4);
+        using var blockingPolicy = new BlockingPolicy<PooledComponent>(4);
 
         builder.RegisterType<PooledComponent>().As<IPooledService>()
                                                .PooledInstancePerLifetimeScope(blockingPolicy);
@@ -60,10 +60,11 @@ public class ConcurrencyTests
         container.Dispose();
     }
 
-    private class BlockingPolicy<TLimit> : DefaultPooledRegistrationPolicy<TLimit>
+    private class BlockingPolicy<TLimit> : DefaultPooledRegistrationPolicy<TLimit>, IDisposable
         where TLimit : class
     {
         private readonly SemaphoreSlim _semaphore;
+        private bool _disposedValue;
 
         public BlockingPolicy(int maxConcurrentInstances) : base(maxConcurrentInstances)
         {
@@ -86,6 +87,26 @@ public class ConcurrencyTests
             _semaphore.Release();
 
             return base.Return(pooledObject);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    _semaphore.Dispose();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

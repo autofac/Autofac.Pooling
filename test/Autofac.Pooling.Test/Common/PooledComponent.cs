@@ -4,6 +4,7 @@ using Autofac.Core;
 
 namespace Autofac.Pooling.Tests.Common;
 
+[SuppressMessage("CA1063", "CA1063", Justification = "Dispose remains simple here for testing.")]
 public class PooledComponent : IPooledService, IPooledComponent, IDisposable
 {
     public int GetCalled
@@ -31,6 +32,7 @@ public class PooledComponent : IPooledService, IPooledComponent, IDisposable
         ReturnCalled++;
     }
 
+    [SuppressMessage("CA1063", "CA1063", Justification = "Dispose remains simple here for testing.")]
     public void Dispose()
     {
         DisposeCalled++;

@@ -39,6 +39,11 @@ internal sealed class PooledInstanceTracker<TPooledObject> : IDisposable
     /// </summary>
     public void Dispose()
     {
+        if (Instance is IPooledComponent poolAwareComponent)
+        {
+            poolAwareComponent.OnReturnToPool();
+        }
+
         // Put the instance back in the pool.
         _pool.Return(Instance);
     }

@@ -15,12 +15,14 @@ namespace Autofac.Pooling;
 internal sealed class PoolActivator<TLimit> : IInstanceActivator
     where TLimit : class
 {
-    private readonly Service _pooledInstanceService;
-    private readonly IPooledRegistrationPolicy<TLimit> _policy;
-    private readonly DefaultObjectPoolProvider _poolProvider;
+    private readonly Service? _pooledInstanceService;
+    private readonly IPooledRegistrationPolicy<TLimit>? _policy;
+    private readonly DefaultObjectPoolProvider? _poolProvider;
+    private readonly Func<IComponentContext, ObjectPool<TLimit>>? _poolFactory;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="PoolActivator{TLimit}"/> class.
+    /// Initializes a new instance of the <see cref="PoolActivator{TLimit}"/> class
+    /// using the default <see cref="DefaultObjectPoolProvider"/>.
     /// </summary>
     /// <param name="pooledInstanceService">The service used to resolve new instances of the pooled registration.</param>
     /// <param name="policy">The pool policy.</param>
@@ -34,6 +36,20 @@ internal sealed class PoolActivator<TLimit> : IInstanceActivator
         };
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PoolActivator{TLimit}"/> class
+    /// using a factory function to create the <see cref="ObjectPool{TLimit}"/> at resolve time.
+    /// </summary>
+    /// <param name="poolFactory">
+    /// A factory that returns the <see cref="ObjectPool{TLimit}"/> to use.
+    /// Invoked during resolve, so the <see cref="IComponentContext"/> is available
+    /// for resolving dependencies.
+    /// </param>
+    public PoolActivator(Func<IComponentContext, ObjectPool<TLimit>> poolFactory)
+    {
+        _poolFactory = poolFactory ?? throw new ArgumentNullException(nameof(poolFactory));
+    }
+
     /// <inheritdoc/>
     public Type LimitType { get; } = typeof(TLimit);
 
@@ -42,15 +58,23 @@ internal sealed class PoolActivator<TLimit> : IInstanceActivator
     {
         pipelineBuilder.Use(PipelinePhase.Activation, (context, next) =>
         {
-            // Get a reference to the actual lifetime scope.
-            var scope = context.Resolve<ILifetimeScope>();
+            if (_poolFactory is not null)
+            {
+                // Custom factory: let the caller create the pool at resolve time.
+                context.Instance = _poolFactory(context);
+            }
+            else
+            {
+                // Default path: use DefaultObjectPoolProvider + AutofacPooledObjectPolicy.
+                var scope = context.Resolve<ILifetimeScope>();
 
-            var poolPolicy = new AutofacPooledObjectPolicy<TLimit>(_pooledInstanceService, scope, _policy);
+                var poolPolicy = new AutofacPooledObjectPolicy<TLimit>(_pooledInstanceService!, scope, _policy!);
 
-            // The pool provider will create a disposable pool if the TLimit implements IDisposable.
-            var pool = _poolProvider.Create(poolPolicy);
+                // The pool provider will create a disposable pool if the TLimit implements IDisposable.
+                var pool = _poolProvider!.Create(poolPolicy);
 
-            context.Instance = pool;
+                context.Instance = pool;
+            }
         });
     }
 

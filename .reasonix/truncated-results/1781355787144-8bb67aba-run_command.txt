@@ -1,0 +1,171 @@
+$ dotnet run --project C:\Users\16229\source\OpenSourceLibrary\Autofac.KeyedResilience\demo\Autofac.KeyedResilience.Demo\Autofac.KeyedResilience.Demo.csproj 2>&1
+[exit 0]
+╔══════════════════════════════════════╗
+║   🎮  Autofac.KeyedResilience Demo   ║
+║   HybridCache: FusionCache + SQLite  ║
+╚══════════════════════════════════════╝
+
+info: NeoSmart.Caching.Sqlite.SqliteCache[0]
+      Initializing db cache: Data Source=cache.sqlite.db;Mode=ReadWriteCreate;Cache=Shared
+─── 演示 1: 从对象池取 Monster ───
+info: Program[0]
+      池化怪物: 池化怪物 (Lv.1)
+
+─── 演示 2: Lazy<Task<Monster>> ───
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLJ K=monsters:all): GetOrDefaultAsync<T> call FEO[DUR=30s LKTO=/ SKMR=N SKMW=Y SKDR=N SKDW=Y SKDRWS=N MDUR=/ DDUR=365000.00:00:00 JIT=0 PR=N SZ=/ FS=N FSMAX=1.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=Y AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLJ K=monsters:all): GetOrDefaultAsync<T> return (default value)
+    📂 执行 JSON 加载…
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLK K=monsters:all): SetAsync<T> call FEO[DUR=30s LKTO=/ SKMR=N SKMW=N SKDR=N SKDW=N SKDRWS=N MDUR=/ DDUR=365000.00:00:00 JIT=0 PR=N SZ=/ FS=N FSMAX=1.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=Y AC=N]
+
+─── 演示 3: Polly 管道（内部 HybridCache → FusionCache → SQLite） ───
+info: Program[0]
+      Lazy 加载: 毒蘑菇 (Lv.2, 毒)
+info: Program[0]
+      ──── 第 1 次调用 ────
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLL K=monsters:all): GetOrDefaultAsync<T> call FEO[DUR=30s LKTO=/ SKMR=N SKMW=Y SKDR=N SKDW=Y SKDRWS=N MDUR=/ DDUR=365000.00:00:00 JIT=0 PR=N SZ=/ FS=N FSMAX=1.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=Y AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLM K=__fc:t:!): GetOrSetAsync<T> call FEO[DUR=10.00:00:00 LKTO=/ SKMR=N SKMW=N SKDR=N SKDW=N SKDRWS=N MDUR=/ DDUR=10.00:00:00 JIT=0 PR=NR SZ=0 FS=Y FSMAX=10.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=N AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLM K=__fc:t:!): GetOrSetAsync<T> return FE(M)[T=2026-06-13T13:03:07.013634, LEXP=2026-06-23T13:03:07.017837][S=N, EEXP=/, LM=/, ET=/, S=0, P=NeverRemove]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLN K=__fc:t:*): GetOrSetAsync<T> call FEO[DUR=10.00:00:00 LKTO=/ SKMR=N SKMW=N SKDR=N SKDW=N SKDRWS=N MDUR=/ DDUR=10.00:00:00 JIT=0 PR=NR SZ=0 FS=Y FSMAX=10.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=N AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLN K=__fc:t:*): GetOrSetAsync<T> return FE(M)[T=2026-06-13T13:03:07.036716, LEXP=2026-06-23T13:03:07.036727][S=N, EEXP=/, LM=/, ET=/, S=0, P=NeverRemove]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLL K=monsters:all): GetOrDefaultAsync<T> return FE(M)[T=2026-06-13T13:03:06.885316, LEXP=2026-06-13T13:03:36.885116][]
+
+info: Program[0]
+         🐉 结果: [mon-007] 毒蘑菇 Lv.2 毒
+info: Program[0]
+      ──── 第 2 次调用 ────
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLO K=monsters:all): GetOrDefaultAsync<T> call FEO[DUR=30s LKTO=/ SKMR=N SKMW=Y SKDR=N SKDW=Y SKDRWS=N MDUR=/ DDUR=365000.00:00:00 JIT=0 PR=N SZ=/ FS=N FSMAX=1.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=Y AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLP K=__fc:t:!): GetOrSetAsync<T> call FEO[DUR=10.00:00:00 LKTO=/ SKMR=N SKMW=N SKDR=N SKDW=N SKDRWS=N MDUR=/ DDUR=10.00:00:00 JIT=0 PR=NR SZ=0 FS=Y FSMAX=10.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=N AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLP K=__fc:t:!): GetOrSetAsync<T> return FE(M)[T=2026-06-13T13:03:07.013634, LEXP=2026-06-23T13:03:07.017837][S=N, EEXP=/, LM=/, ET=/, S=0, P=NeverRemove]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLQ K=__fc:t:*): GetOrSetAsync<T> call FEO[DUR=10.00:00:00 LKTO=/ SKMR=N SKMW=N SKDR=N SKDW=N SKDRWS=N MDUR=/ DDUR=10.00:00:00 JIT=0 PR=NR SZ=0 FS=Y FSMAX=10.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=N AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLQ K=__fc:t:*): GetOrSetAsync<T> return FE(M)[T=2026-06-13T13:03:07.036716, LEXP=2026-06-23T13:03:07.036727][S=N, EEXP=/, LM=/, ET=/, S=0, P=NeverRemove]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLO K=monsters:all): GetOrDefaultAsync<T> return FE(M)[T=2026-06-13T13:03:06.885316, LEXP=2026-06-13T13:03:36.885116][]
+info: Program[0]
+         🐉 结果: [mon-008] 岩石傀儡 Lv.8 地
+
+info: Program[0]
+      ──── 第 3 次调用 ────
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLR K=monsters:all): GetOrDefaultAsync<T> call FEO[DUR=30s LKTO=/ SKMR=N SKMW=Y SKDR=N SKDW=Y SKDRWS=N MDUR=/ DDUR=365000.00:00:00 JIT=0 PR=N SZ=/ FS=N FSMAX=1.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=Y AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLS K=__fc:t:!): GetOrSetAsync<T> call FEO[DUR=10.00:00:00 LKTO=/ SKMR=N SKMW=N SKDR=N SKDW=N SKDRWS=N MDUR=/ DDUR=10.00:00:00 JIT=0 PR=NR SZ=0 FS=Y FSMAX=10.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=N AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLS K=__fc:t:!): GetOrSetAsync<T> return FE(M)[T=2026-06-13T13:03:07.013634, LEXP=2026-06-23T13:03:07.017837][S=N, EEXP=/, LM=/, ET=/, S=0, P=NeverRemove]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLT K=__fc:t:*): GetOrSetAsync<T> call FEO[DUR=10.00:00:00 LKTO=/ SKMR=N SKMW=N SKDR=N SKDW=N SKDRWS=N MDUR=/ DDUR=10.00:00:00 JIT=0 PR=NR SZ=0 FS=Y FSMAX=10.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=N AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLT K=__fc:t:*): GetOrSetAsync<T> return FE(M)[T=2026-06-13T13:03:07.036716, LEXP=2026-06-23T13:03:07.036727][S=N, EEXP=/, LM=/, ET=/, S=0, P=NeverRemove]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLR K=monsters:all): GetOrDefaultAsync<T> return FE(M)[T=2026-06-13T13:03:06.885316, LEXP=2026-06-13T13:03:36.885116][]
+
+info: Program[0]
+         🐉 结果: [mon-002] 火焰精灵 Lv.3 火
+info: Program[0]
+      ──── 第 4 次调用 ────
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLU K=monsters:all): GetOrDefaultAsync<T> call FEO[DUR=30s LKTO=/ SKMR=N SKMW=Y SKDR=N SKDW=Y SKDRWS=N MDUR=/ DDUR=365000.00:00:00 JIT=0 PR=N SZ=/ FS=N FSMAX=1.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=Y AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLV K=__fc:t:!): GetOrSetAsync<T> call FEO[DUR=10.00:00:00 LKTO=/ SKMR=N SKMW=N SKDR=N SKDW=N SKDRWS=N MDUR=/ DDUR=10.00:00:00 JIT=0 PR=NR SZ=0 FS=Y FSMAX=10.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=N AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLV K=__fc:t:!): GetOrSetAsync<T> return FE(M)[T=2026-06-13T13:03:07.013634, LEXP=2026-06-23T13:03:07.017837][S=N, EEXP=/, LM=/, ET=/, S=0, P=NeverRemove]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFM0 K=__fc:t:*): GetOrSetAsync<T> call FEO[DUR=10.00:00:00 LKTO=/ SKMR=N SKMW=N SKDR=N SKDW=N SKDRWS=N MDUR=/ DDUR=10.00:00:00 JIT=0 PR=NR SZ=0 FS=Y FSMAX=10.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=N AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFM0 K=__fc:t:*): GetOrSetAsync<T> return FE(M)[T=2026-06-13T13:03:07.036716, LEXP=2026-06-23T13:03:07.036727][S=N, EEXP=/, LM=/, ET=/, S=0, P=NeverRemove]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFLU K=monsters:all): GetOrDefaultAsync<T> return FE(M)[T=2026-06-13T13:03:06.885316, LEXP=2026-06-13T13:03:36.885116][]
+info: Program[0]
+         🐉 结果: [mon-002] 火焰精灵 Lv.3 火
+
+info: Program[0]
+      ──── 第 5 次调用 ────
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFM1 K=monsters:all): GetOrDefaultAsync<T> call FEO[DUR=30s LKTO=/ SKMR=N SKMW=Y SKDR=N SKDW=Y SKDRWS=N MDUR=/ DDUR=365000.00:00:00 JIT=0 PR=N SZ=/ FS=N FSMAX=1.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=Y AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFM2 K=__fc:t:!): GetOrSetAsync<T> call FEO[DUR=10.00:00:00 LKTO=/ SKMR=N SKMW=N SKDR=N SKDW=N SKDRWS=N MDUR=/ DDUR=10.00:00:00 JIT=0 PR=NR SZ=0 FS=Y FSMAX=10.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=N AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFM2 K=__fc:t:!): GetOrSetAsync<T> return FE(M)[T=2026-06-13T13:03:07.013634, LEXP=2026-06-23T13:03:07.017837][S=N, EEXP=/, LM=/, ET=/, S=0, P=NeverRemove]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFM3 K=__fc:t:*): GetOrSetAsync<T> call FEO[DUR=10.00:00:00 LKTO=/ SKMR=N SKMW=N SKDR=N SKDW=N SKDRWS=N MDUR=/ DDUR=10.00:00:00 JIT=0 PR=NR SZ=0 FS=Y FSMAX=10.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=N AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFM3 K=__fc:t:*): GetOrSetAsync<T> return FE(M)[T=2026-06-13T13:03:07.036716, LEXP=2026-06-23T13:03:07.036727][S=N, EEXP=/, LM=/, ET=/, S=0, P=NeverRemove]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFM1 K=monsters:all): GetOrDefaultAsync<T> return FE(M)[T=2026-06-13T13:03:06.885316, LEXP=2026-06-13T13:03:36.885116][]
+info: Program[0]
+         🐉 结果: [mon-008] 岩石傀儡 Lv.8 地
+
+─── 演示 4: 缓存验证 ───
+info: Program[0]
+      ──── 第 1 次调用 GetMonstersAsync ────
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFM4 K=monsters:all): GetOrDefaultAsync<T> call FEO[DUR=30s LKTO=/ SKMR=N SKMW=Y SKDR=N SKDW=Y SKDRWS=N MDUR=/ DDUR=365000.00:00:00 JIT=0 PR=N SZ=/ FS=N FSMAX=1.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=Y AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFM5 K=__fc:t:!): GetOrSetAsync<T> call FEO[DUR=10.00:00:00 LKTO=/ SKMR=N SKMW=N SKDR=N SKDW=N SKDRWS=N MDUR=/ DDUR=10.00:00:00 JIT=0 PR=NR SZ=0 FS=Y FSMAX=10.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=N AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFM5 K=__fc:t:!): GetOrSetAsync<T> return FE(M)[T=2026-06-13T13:03:07.013634, LEXP=2026-06-23T13:03:07.017837][S=N, EEXP=/, LM=/, ET=/, S=0, P=NeverRemove]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFM6 K=__fc:t:*): GetOrSetAsync<T> call FEO[DUR=10.00:00:00 LKTO=/ SKMR=N SKMW=N SKDR=N SKDW=N SKDRWS=N MDUR=/ DDUR=10.00:00:00 JIT=0 PR=NR SZ=0 FS=Y FSMAX=10.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=N AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFM6 K=__fc:t:*): GetOrSetAsync<T> return FE(M)[T=2026-06-13T13:03:07.036716, LEXP=2026-06-23T13:03:07.036727][S=N, EEXP=/, LM=/, ET=/, S=0, P=NeverRemove]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFM4 K=monsters:all): GetOrDefaultAsync<T> return FE(M)[T=2026-06-13T13:03:06.885316, LEXP=2026-06-13T13:03:36.885116][]
+info: Program[0]
+         📦 拿到 10 个怪物
+info: Program[0]
+      ──── 第 2 次调用 GetMonstersAsync ────
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFM7 K=monsters:all): GetOrDefaultAsync<T> call FEO[DUR=30s LKTO=/ SKMR=N SKMW=Y SKDR=N SKDW=Y SKDRWS=N MDUR=/ DDUR=365000.00:00:00 JIT=0 PR=N SZ=/ FS=N FSMAX=1.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=Y AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFM8 K=__fc:t:!): GetOrSetAsync<T> call FEO[DUR=10.00:00:00 LKTO=/ SKMR=N SKMW=N SKDR=N SKDW=N SKDRWS=N MDUR=/ DDUR=10.00:00:00 JIT=0 PR=NR SZ=0 FS=Y FSMAX=10.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=N AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFM8 K=__fc:t:!): GetOrSetAsync<T> return FE(M)[T=2026-06-13T13:03:07.013634, LEXP=2026-06-23T13:03:07.017837][S=N, EEXP=/, LM=/, ET=/, S=0, P=NeverRemove]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFM9 K=__fc:t:*): GetOrSetAsync<T> call FEO[DUR=10.00:00:00 LKTO=/ SKMR=N SKMW=N SKDR=N SKDW=N SKDRWS=N MDUR=/ DDUR=10.00:00:00 JIT=0 PR=NR SZ=0 FS=Y FSMAX=10.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=N AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFM9 K=__fc:t:*): GetOrSetAsync<T> return FE(M)[T=2026-06-13T13:03:07.036716, LEXP=2026-06-23T13:03:07.036727][S=N, EEXP=/, LM=/, ET=/, S=0, P=NeverRemove]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFM7 K=monsters:all): GetOrDefaultAsync<T> return FE(M)[T=2026-06-13T13:03:06.885316, LEXP=2026-06-13T13:03:36.885116][]
+info: Program[0]
+         📦 拿到 10 个怪物
+info: Program[0]
+      ──── 第 3 次调用 GetMonstersAsync ────
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFMA K=monsters:all): GetOrDefaultAsync<T> call FEO[DUR=30s LKTO=/ SKMR=N SKMW=Y SKDR=N SKDW=Y SKDRWS=N MDUR=/ DDUR=365000.00:00:00 JIT=0 PR=N SZ=/ FS=N FSMAX=1.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=Y AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFMB K=__fc:t:!): GetOrSetAsync<T> call FEO[DUR=10.00:00:00 LKTO=/ SKMR=N SKMW=N SKDR=N SKDW=N SKDRWS=N MDUR=/ DDUR=10.00:00:00 JIT=0 PR=NR SZ=0 FS=Y FSMAX=10.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=N AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFMB K=__fc:t:!): GetOrSetAsync<T> return FE(M)[T=2026-06-13T13:03:07.013634, LEXP=2026-06-23T13:03:07.017837][S=N, EEXP=/, LM=/, ET=/, S=0, P=NeverRemove]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFMC K=__fc:t:*): GetOrSetAsync<T> call FEO[DUR=10.00:00:00 LKTO=/ SKMR=N SKMW=N SKDR=N SKDW=N SKDRWS=N MDUR=/ DDUR=10.00:00:00 JIT=0 PR=NR SZ=0 FS=Y FSMAX=10.00:00:00 DFSMAX=/ FSTHR=30s FSTO=/ FHTO=/ TOFC=Y DSTO=/ DHTO=/ ABDO=N SBN=N ABBO=N AC=N]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFMC K=__fc:t:*): GetOrSetAsync<T> return FE(M)[T=2026-06-13T13:03:07.036716, LEXP=2026-06-23T13:03:07.036727][S=N, EEXP=/, LM=/, ET=/, S=0, P=NeverRemove]
+info: ZiggyCreatures.Caching.Fusion.FusionCache[0]
+      FUSION [N=FusionCache I=0HNM99GE6IFLI] (O=0HNM99GE6IFMA K=monsters:all): GetOrDefaultAsync<T> return FE(M)[T=2026-06-13T13:03:06.885316, LEXP=2026-06-13T13:03:36.885116][]
+info: Program[0]
+         📦 拿到 10 个怪物
+
+─── 演示 5: 池化对象复用 ───
+info: Program[0]
+      取出: 池化怪物
+info: Program[0]
+      已归还
+info: Program[0]
+      再次取出: 池化怪物
+
+info: Program[0]
+      是否同一个对象: True
+🏁 演示结束

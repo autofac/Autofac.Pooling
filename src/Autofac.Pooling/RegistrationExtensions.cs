@@ -11,7 +11,6 @@ using Autofac.Core.Lifetime;
 using Autofac.Core.Registration;
 using Autofac.Core.Resolving.Middleware;
 using Autofac.Core.Resolving.Pipeline;
-using Microsoft.Extensions.ObjectPool;
 
 namespace Autofac.Pooling;
 
@@ -146,30 +145,32 @@ public static class RegistrationExtensions
     /// </summary>
     /// <remarks>
     /// <para>
-    /// This method accepts a factory function that returns the <see cref="ObjectPool{TLimit}"/> to use. The factory is invoked
-    /// during resolve, so you may resolve dependencies from the <see cref="IComponentContext"/> (e.g. <c>sp =&gt; sp.Resolve&lt;ObjectPool&lt;T&gt;&gt;()</c>).
-    /// This allows the pool itself to be registered as a component and have its dependencies managed by the container.
+    /// This method accepts a factory function that returns the <see cref="IPooledRegistrationPolicy{TLimit}"/> to use.
+    /// The factory is invoked during resolve, so you may resolve dependencies from the <see cref="IComponentContext"/>
+    /// (e.g. <c>ctx =&gt; ctx.Resolve&lt;IMyPolicy&gt;()</c>).
+    /// This allows the policy itself to be registered as a component and have its dependencies managed by the container.
     /// </para>
     ///
     /// <para>
-    /// If the <see cref="ObjectPool{TLimit}"/> created by the factory implements <see cref="IDisposable"/>, it will be disposed
-    /// when the container is disposed. Components implementing <see cref="IPooledComponent"/> will still receive
-    /// <see cref="IPooledComponent.OnGetFromPool"/> and <see cref="IPooledComponent.OnReturnToPool"/> lifecycle notifications.
+    /// The size of the pool created with this method is equal to the <see cref="IPooledRegistrationPolicy{TLimit}.MaximumRetained"/>
+    /// value returned by the factory.
+    /// If more instances are requested than the pool size, those instances may not be returned to the pool,
+    /// but will instead be disposed/discarded.
     /// </para>
     /// </remarks>
     /// <typeparam name="TLimit">Registration limit type.</typeparam>
     /// <typeparam name="TActivatorData">Activator data type.</typeparam>
     /// <typeparam name="TSingleRegistrationStyle">Registration style.</typeparam>
     /// <param name="registration">The registration.</param>
-    /// <param name="poolFactory">
-    /// A factory that returns the <see cref="ObjectPool{TLimit}"/> to use for this registration.
+    /// <param name="policyFactory">
+    /// A factory that returns the <see cref="IPooledRegistrationPolicy{TLimit}"/> to use for this registration.
     /// Invoked during resolve with access to the current <see cref="IComponentContext"/>.
     /// </param>
     /// <returns>The registration builder.</returns>
     public static IRegistrationBuilder<TLimit, TActivatorData, TSingleRegistrationStyle>
            PooledInstancePerLifetimeScope<TLimit, TActivatorData, TSingleRegistrationStyle>(
                this IRegistrationBuilder<TLimit, TActivatorData, TSingleRegistrationStyle> registration,
-               Func<IComponentContext, ObjectPool<TLimit>> poolFactory)
+               Func<IComponentContext, IPooledRegistrationPolicy<TLimit>> policyFactory)
            where TSingleRegistrationStyle : SingleRegistrationStyle
            where TActivatorData : IConcreteActivatorData
            where TLimit : class
@@ -179,12 +180,12 @@ public static class RegistrationExtensions
             throw new ArgumentNullException(nameof(registration));
         }
 
-        if (poolFactory == null)
+        if (policyFactory == null)
         {
-            throw new ArgumentNullException(nameof(poolFactory));
+            throw new ArgumentNullException(nameof(policyFactory));
         }
 
-        RegisterPooled(registration, poolFactory, null);
+        RegisterPooled(registration, policyFactory, null);
 
         return registration;
     }
@@ -326,6 +327,64 @@ public static class RegistrationExtensions
         return registration;
     }
 
+    /// <summary>
+    /// Configure the component so that every dependent component or manual resolve within
+    /// a <see cref="ILifetimeScope"/> tagged with any of the provided tags value gets the same, shared instance,
+    /// retrieved from a single pool of instances shared by all lifetime scopes.
+    /// When the scope ends, the instance will be returned to the pool.
+    /// Dependent components in lifetime scopes that are children of the tagged scope will
+    /// share the parent's instance. If no appropriately tagged scope can be found in the
+    /// hierarchy an <see cref="DependencyResolutionException"/> is thrown.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This method accepts a factory function that returns the <see cref="IPooledRegistrationPolicy{TLimit}"/> to use.
+    /// The factory is invoked during resolve, so you may resolve dependencies from the <see cref="IComponentContext"/>
+    /// (e.g. <c>ctx =&gt; ctx.Resolve&lt;IMyPolicy&gt;()</c>).
+    /// This allows the policy itself to be registered as a component and have its dependencies managed by the container.
+    /// </para>
+    ///
+    /// <para>
+    /// The size of the pool created with this method is equal to the <see cref="IPooledRegistrationPolicy{TLimit}.MaximumRetained"/>
+    /// value returned by the factory.
+    /// If more instances are requested than the pool size, those instances may not be returned to the pool,
+    /// but will instead be disposed/discarded.
+    /// </para>
+    /// </remarks>
+    /// <typeparam name="TLimit">Registration limit type.</typeparam>
+    /// <typeparam name="TActivatorData">Activator data type.</typeparam>
+    /// <typeparam name="TSingleRegistrationStyle">Registration style.</typeparam>
+    /// <param name="registration">The registration.</param>
+    /// <param name="policyFactory">
+    /// A factory that returns the <see cref="IPooledRegistrationPolicy{TLimit}"/> to use for this registration.
+    /// Invoked during resolve with access to the current <see cref="IComponentContext"/>.
+    /// </param>
+    /// <param name="lifetimeScopeTags">Tags applied to matching lifetime scopes.</param>
+    /// <returns>The registration builder.</returns>
+    public static IRegistrationBuilder<TLimit, TActivatorData, TSingleRegistrationStyle>
+           PooledInstancePerMatchingLifetimeScope<TLimit, TActivatorData, TSingleRegistrationStyle>(
+               this IRegistrationBuilder<TLimit, TActivatorData, TSingleRegistrationStyle> registration,
+               Func<IComponentContext, IPooledRegistrationPolicy<TLimit>> policyFactory,
+               params object[] lifetimeScopeTags)
+           where TSingleRegistrationStyle : SingleRegistrationStyle
+           where TActivatorData : IConcreteActivatorData
+           where TLimit : class
+    {
+        if (registration == null)
+        {
+            throw new ArgumentNullException(nameof(registration));
+        }
+
+        if (policyFactory == null)
+        {
+            throw new ArgumentNullException(nameof(policyFactory));
+        }
+
+        RegisterPooled(registration, policyFactory, lifetimeScopeTags);
+
+        return registration;
+    }
+
     private static void RegisterPooled<TLimit, TActivatorData, TSingleRegistrationStyle>(
         IRegistrationBuilder<TLimit, TActivatorData, TSingleRegistrationStyle> registration,
         IPooledRegistrationPolicy<TLimit> registrationPolicy,
@@ -430,9 +489,11 @@ public static class RegistrationExtensions
         callback.Callback = newCallback;
     }
 
+
+
     private static void RegisterPooled<TLimit, TActivatorData, TSingleRegistrationStyle>(
         IRegistrationBuilder<TLimit, TActivatorData, TSingleRegistrationStyle> registration,
-        Func<IComponentContext, ObjectPool<TLimit>> poolFactory,
+        Func<IComponentContext, IPooledRegistrationPolicy<TLimit>> policyFactory,
         object[]? tags)
         where TSingleRegistrationStyle : SingleRegistrationStyle
         where TActivatorData : IConcreteActivatorData
@@ -443,9 +504,9 @@ public static class RegistrationExtensions
             throw new ArgumentNullException(nameof(registration));
         }
 
-        if (poolFactory == null)
+        if (policyFactory == null)
         {
-            throw new ArgumentNullException(nameof(poolFactory));
+            throw new ArgumentNullException(nameof(policyFactory));
         }
 
         // Mark the lifetime appropriately.
@@ -505,7 +566,7 @@ public static class RegistrationExtensions
 
             var poolRegistration = new ComponentRegistration(
                 Guid.NewGuid(),
-                new PoolActivator<TLimit>(poolFactory),
+                new PoolActivator<TLimit>(pooledInstanceService, policyFactory),
                 RootScopeLifetime.Instance,
                 InstanceSharing.Shared,
                 InstanceOwnership.OwnedByLifetimeScope,
@@ -520,7 +581,7 @@ public static class RegistrationExtensions
             // the original registration. This registration will access the pool and return an instance from it.
             var poolGetRegistration = new ComponentRegistration(
                 Guid.NewGuid(),
-                new PoolGetActivator<TLimit>(poolService, new DelegatingPooledRegistrationPolicy<TLimit>()),
+                new PoolGetActivator<TLimit>(poolService, policyFactory),
                 pooledGetLifetime,
                 InstanceSharing.Shared,
                 InstanceOwnership.OwnedByLifetimeScope,

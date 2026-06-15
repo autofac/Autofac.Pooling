@@ -18,7 +18,7 @@ internal sealed class PoolActivator<TLimit> : IInstanceActivator
     private readonly Service? _pooledInstanceService;
     private readonly IPooledRegistrationPolicy<TLimit>? _policy;
     private readonly DefaultObjectPoolProvider? _poolProvider;
-    private readonly Func<IComponentContext, ObjectPool<TLimit>>? _poolFactory;
+    private readonly Func<IComponentContext, IPooledRegistrationPolicy<TLimit>>? _policyFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PoolActivator{TLimit}"/> class
@@ -38,16 +38,19 @@ internal sealed class PoolActivator<TLimit> : IInstanceActivator
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PoolActivator{TLimit}"/> class
-    /// using a factory function to create the <see cref="ObjectPool{TLimit}"/> at resolve time.
+    /// using a factory function to create the <see cref="IPooledRegistrationPolicy{TLimit}"/> at resolve time.
+    /// The default <see cref="DefaultObjectPoolProvider"/> will create the backing pool.
     /// </summary>
-    /// <param name="poolFactory">
-    /// A factory that returns the <see cref="ObjectPool{TLimit}"/> to use.
+    /// <param name="pooledInstanceService">The service used to resolve new instances of the pooled registration.</param>
+    /// <param name="policyFactory">
+    /// A factory that returns the <see cref="IPooledRegistrationPolicy{TLimit}"/> to use.
     /// Invoked during resolve, so the <see cref="IComponentContext"/> is available
     /// for resolving dependencies.
     /// </param>
-    public PoolActivator(Func<IComponentContext, ObjectPool<TLimit>> poolFactory)
+    public PoolActivator(Service pooledInstanceService, Func<IComponentContext, IPooledRegistrationPolicy<TLimit>> policyFactory)
     {
-        _poolFactory = poolFactory ?? throw new ArgumentNullException(nameof(poolFactory));
+        _pooledInstanceService = pooledInstanceService;
+        _policyFactory = policyFactory ?? throw new ArgumentNullException(nameof(policyFactory));
     }
 
     /// <inheritdoc/>
@@ -58,10 +61,18 @@ internal sealed class PoolActivator<TLimit> : IInstanceActivator
     {
         pipelineBuilder.Use(PipelinePhase.Activation, (context, next) =>
         {
-            if (_poolFactory is not null)
+            if (_policyFactory is not null)
             {
-                // Custom factory: let the caller create the pool at resolve time.
-                context.Instance = _poolFactory(context);
+                // Custom policy factory: resolve the strategy at resolve time, then create DefaultObjectPool.
+                var policy = _policyFactory(context);
+                var poolProvider = new DefaultObjectPoolProvider
+                {
+                    MaximumRetained = policy.MaximumRetained,
+                };
+                var scope = context.Resolve<ILifetimeScope>();
+                var poolPolicy = new AutofacPooledObjectPolicy<TLimit>(_pooledInstanceService!, scope, policy);
+                var pool = poolProvider.Create(poolPolicy);
+                context.Instance = pool;
             }
             else
             {

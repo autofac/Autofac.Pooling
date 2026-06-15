@@ -17,7 +17,8 @@ internal sealed class PoolGetActivator<TLimit> : IInstanceActivator
     where TLimit : class
 {
     private readonly PoolService _poolService;
-    private readonly IPooledRegistrationPolicy<TLimit> _registrationPolicy;
+    private readonly IPooledRegistrationPolicy<TLimit>? _registrationPolicy;
+    private readonly Func<IComponentContext, IPooledRegistrationPolicy<TLimit>>? _policyFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PoolGetActivator{TLimit}"/> class.
@@ -30,6 +31,21 @@ internal sealed class PoolGetActivator<TLimit> : IInstanceActivator
         _registrationPolicy = registrationPolicy;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PoolGetActivator{TLimit}"/> class
+    /// with a factory that resolves the policy at resolve time.
+    /// </summary>
+    /// <param name="poolService">The service used to access the pool.</param>
+    /// <param name="policyFactory">
+    /// A factory that returns the <see cref="IPooledRegistrationPolicy{TLimit}"/> to use.
+    /// Invoked during resolve with access to the current <see cref="IComponentContext"/>.
+    /// </param>
+    public PoolGetActivator(PoolService poolService, Func<IComponentContext, IPooledRegistrationPolicy<TLimit>> policyFactory)
+    {
+        _poolService = poolService;
+        _policyFactory = policyFactory ?? throw new ArgumentNullException(nameof(policyFactory));
+    }
+
     /// <inheritdoc/>
     public Type LimitType { get; } = typeof(TLimit);
 
@@ -39,6 +55,7 @@ internal sealed class PoolGetActivator<TLimit> : IInstanceActivator
         pipelineBuilder.Use(PipelinePhase.Activation, (ctxt, next) =>
         {
             var pool = (ObjectPool<TLimit>)ctxt.ResolveService(_poolService);
+            var policy = _policyFactory?.Invoke(ctxt) ?? _registrationPolicy!;
             var didGetFromPool = false;
 
             TLimit PoolGet()
@@ -47,11 +64,11 @@ internal sealed class PoolGetActivator<TLimit> : IInstanceActivator
                 return pool.Get();
             }
 
-            var poolItem = _registrationPolicy.Get(ctxt, ctxt.Parameters, PoolGet) ?? throw new InvalidOperationException(
+            var poolItem = policy.Get(ctxt, ctxt.Parameters, PoolGet) ?? throw new InvalidOperationException(
                     string.Format(
                         CultureInfo.CurrentCulture,
                         PoolGetActivatorResources.PolicyMustReturnInstance,
-                        _registrationPolicy.GetType().FullName,
+                        policy.GetType().FullName,
                         typeof(TLimit).FullName));
 
             if (didGetFromPool)

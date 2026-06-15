@@ -39,11 +39,6 @@ internal sealed class AutofacPooledObjectPolicy<TPooledObject> : IPooledObjectPo
     /// <inheritdoc/>
     public bool Return(TPooledObject obj)
     {
-        if (obj is IPooledComponent poolAwareComponent)
-        {
-            poolAwareComponent.OnReturnToPool();
-        }
-
         if (_servicePolicy.Return(obj))
         {
             return true;

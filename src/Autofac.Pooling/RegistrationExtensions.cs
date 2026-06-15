@@ -489,8 +489,6 @@ public static class RegistrationExtensions
         callback.Callback = newCallback;
     }
 
-
-
     private static void RegisterPooled<TLimit, TActivatorData, TSingleRegistrationStyle>(
         IRegistrationBuilder<TLimit, TActivatorData, TSingleRegistrationStyle> registration,
         Func<IComponentContext, IPooledRegistrationPolicy<TLimit>> policyFactory,
@@ -581,7 +579,7 @@ public static class RegistrationExtensions
             // the original registration. This registration will access the pool and return an instance from it.
             var poolGetRegistration = new ComponentRegistration(
                 Guid.NewGuid(),
-                new PoolGetActivator<TLimit>(poolService, policyFactory),
+                new PoolGetActivator<TLimit>(poolService),
                 pooledGetLifetime,
                 InstanceSharing.Shared,
                 InstanceOwnership.OwnedByLifetimeScope,

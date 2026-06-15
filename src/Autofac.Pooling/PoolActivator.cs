@@ -72,7 +72,7 @@ internal sealed class PoolActivator<TLimit> : IInstanceActivator
                 var scope = context.Resolve<ILifetimeScope>();
                 var poolPolicy = new AutofacPooledObjectPolicy<TLimit>(_pooledInstanceService!, scope, policy);
                 var pool = poolProvider.Create(poolPolicy);
-                context.Instance = pool;
+                context.Instance = new PooledInstanceContext<TLimit>(pool, policy);
             }
             else
             {

@@ -18,7 +18,6 @@ internal sealed class PoolGetActivator<TLimit> : IInstanceActivator
 {
     private readonly PoolService _poolService;
     private readonly IPooledRegistrationPolicy<TLimit>? _registrationPolicy;
-    private readonly Func<IComponentContext, IPooledRegistrationPolicy<TLimit>>? _policyFactory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PoolGetActivator{TLimit}"/> class.
@@ -32,18 +31,13 @@ internal sealed class PoolGetActivator<TLimit> : IInstanceActivator
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="PoolGetActivator{TLimit}"/> class
-    /// with a factory that resolves the policy at resolve time.
+    /// Initializes a new instance of the <see cref="PoolGetActivator{TLimit}"/> class.
+    /// The policy will be retrieved from the <see cref="PooledInstanceContext{TLimit}"/> at resolve time.
     /// </summary>
     /// <param name="poolService">The service used to access the pool.</param>
-    /// <param name="policyFactory">
-    /// A factory that returns the <see cref="IPooledRegistrationPolicy{TLimit}"/> to use.
-    /// Invoked during resolve with access to the current <see cref="IComponentContext"/>.
-    /// </param>
-    public PoolGetActivator(PoolService poolService, Func<IComponentContext, IPooledRegistrationPolicy<TLimit>> policyFactory)
+    public PoolGetActivator(PoolService poolService)
     {
         _poolService = poolService;
-        _policyFactory = policyFactory ?? throw new ArgumentNullException(nameof(policyFactory));
     }
 
     /// <inheritdoc/>
@@ -54,8 +48,10 @@ internal sealed class PoolGetActivator<TLimit> : IInstanceActivator
     {
         pipelineBuilder.Use(PipelinePhase.Activation, (ctxt, next) =>
         {
-            var pool = (ObjectPool<TLimit>)ctxt.ResolveService(_poolService);
-            var policy = _policyFactory?.Invoke(ctxt) ?? _registrationPolicy!;
+            var resolved = ctxt.ResolveService(_poolService);
+            var ctx = resolved as PooledInstanceContext<TLimit>;
+            var pool = ctx is not null ? ctx.Pool : (ObjectPool<TLimit>)resolved;
+            var policy = ctx is not null ? ctx.Policy : _registrationPolicy!;
             var didGetFromPool = false;
 
             TLimit PoolGet()

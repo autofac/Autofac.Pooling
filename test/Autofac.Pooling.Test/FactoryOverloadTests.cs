@@ -1,6 +1,9 @@
 // Copyright (c) Autofac Project. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Autofac.Pooling.Tests.Common;
 using Xunit;
 
@@ -93,33 +96,6 @@ public class FactoryOverloadTests
     }
 
     [Fact]
-    public void PolicyFactory_PolicyAcceptsAllReturns()
-    {
-        var builder = new ContainerBuilder();
-
-        var defaultPolicy = new DefaultPooledRegistrationPolicy<PooledComponent>();
-        builder.RegisterInstance(defaultPolicy).As<IPooledRegistrationPolicy<PooledComponent>>();
-
-        builder.RegisterType<PooledComponent>()
-               .As<IPooledService>()
-               .PooledInstancePerLifetimeScope(ctx => ctx.Resolve<IPooledRegistrationPolicy<PooledComponent>>());
-
-        var container = builder.Build();
-
-        using (var scope = container.BeginLifetimeScope())
-        {
-            scope.Resolve<IPooledService>();
-        }
-
-        using (var scope2 = container.BeginLifetimeScope())
-        {
-            scope2.Resolve<IPooledService>();
-        }
-
-        container.Dispose();
-    }
-
-    [Fact]
     public void PolicyFactory_PolicyFactoryReceivesComponentContext()
     {
         var builder = new ContainerBuilder();
@@ -174,6 +150,90 @@ public class FactoryOverloadTests
         }
 
         container.Dispose();
+    }
+
+    [Fact]
+    public void PolicyFactory_NonSingletonPolicySharesSameInstance()
+    {
+        // Factory creates a NEW tracking policy instance each time.
+        // The policy used by PoolActivator (for sizing/Return) must be
+        // the SAME instance used by PoolGetActivator (for Get).
+        var builder = new ContainerBuilder();
+
+        var factoryCallCount = 0;
+
+        builder.RegisterType<PooledComponent>()
+               .As<IPooledService>()
+               .PooledInstancePerLifetimeScope(ctx =>
+               {
+                   factoryCallCount++;
+                   return new PoolTrackingPolicy<PooledComponent>();
+               });
+
+        var container = builder.Build();
+
+        using (var scope = container.BeginLifetimeScope())
+        {
+            var instance = scope.Resolve<IPooledService>();
+            Assert.NotNull(instance);
+        }
+
+        // Factory should have been invoked exactly once (during pool construction).
+        Assert.Equal(1, factoryCallCount);
+
+        container.Dispose();
+    }
+
+    [Fact]
+    public void PolicyFactory_NullPolicyFactoryThrows()
+    {
+        var builder = new ContainerBuilder();
+
+        var reg = builder.RegisterType<PooledComponent>()
+                         .As<IPooledService>();
+
+        Assert.Throws<ArgumentNullException>(() =>
+            reg.PooledInstancePerLifetimeScope(
+                (Func<IComponentContext, IPooledRegistrationPolicy<PooledComponent>>)null!));
+    }
+
+    [Fact]
+    public void PolicyFactory_NullPolicyFactoryWithMatchingScopeThrows()
+    {
+        var builder = new ContainerBuilder();
+
+        var reg = builder.RegisterType<PooledComponent>()
+                         .As<IPooledService>();
+
+        Assert.Throws<ArgumentNullException>(() =>
+            reg.PooledInstancePerMatchingLifetimeScope(
+                (Func<IComponentContext, IPooledRegistrationPolicy<PooledComponent>>)null!,
+                "tag"));
+    }
+
+    [Fact]
+    public async Task PolicyFactory_CanUseConcurrently()
+    {
+        var builder = new ContainerBuilder();
+
+        builder.RegisterType<PooledComponent>()
+               .As<IPooledService>()
+               .PooledInstancePerLifetimeScope(ctx => new DefaultPooledRegistrationPolicy<PooledComponent>());
+
+        var container = builder.Build();
+
+        var exception = await Record.ExceptionAsync(async () =>
+        {
+            await Task.WhenAll(Enumerable.Range(0, 100).Select(i => Task.Run(() =>
+            {
+                using var scope = container.BeginLifetimeScope();
+                scope.Resolve<IPooledService>();
+            })));
+
+            container.Dispose();
+        });
+
+        Assert.Null(exception);
     }
 
     private class PolicyConfig

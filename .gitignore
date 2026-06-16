@@ -166,3 +166,6 @@ $RECYCLE.BIN/
 
 # JetBrains Rider
 .idea
+
+# Reasonix AI assistant
+.reasonix/

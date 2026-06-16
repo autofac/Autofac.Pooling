@@ -1,4 +1,4 @@
-// Copyright (c) Autofac Project. All rights reserved.
+﻿// Copyright (c) Autofac Project. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using Microsoft.Extensions.ObjectPool;
@@ -27,10 +27,16 @@ internal sealed class PooledInstanceContext<TLimit>
     /// <summary>
     /// Gets the object pool.
     /// </summary>
-    public ObjectPool<TLimit> Pool { get; }
+    public ObjectPool<TLimit> Pool
+    {
+        get;
+    }
 
     /// <summary>
     /// Gets the resolved registration policy, shared between pool creation and retrieval.
     /// </summary>
-    public IPooledRegistrationPolicy<TLimit> Policy { get; }
+    public IPooledRegistrationPolicy<TLimit> Policy
+    {
+        get;
+    }
 }

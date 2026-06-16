@@ -1,4 +1,4 @@
-// Copyright (c) Autofac Project. All rights reserved.
+﻿// Copyright (c) Autofac Project. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using System;
@@ -21,6 +21,8 @@ public class FactoryOverloadTests
                .PooledInstancePerLifetimeScope(ctx => new DefaultPooledRegistrationPolicy<PooledComponent>());
 
         var container = builder.Build();
+
+        Assert.NotNull(container);
 
         using (var scope1 = container.BeginLifetimeScope())
         {
@@ -155,9 +157,6 @@ public class FactoryOverloadTests
     [Fact]
     public void PolicyFactory_NonSingletonPolicySharesSameInstance()
     {
-        // Factory creates a NEW tracking policy instance each time.
-        // The policy used by PoolActivator (for sizing/Return) must be
-        // the SAME instance used by PoolGetActivator (for Get).
         var builder = new ContainerBuilder();
 
         var factoryCallCount = 0;
@@ -178,7 +177,6 @@ public class FactoryOverloadTests
             Assert.NotNull(instance);
         }
 
-        // Factory should have been invoked exactly once (during pool construction).
         Assert.Equal(1, factoryCallCount);
 
         container.Dispose();
@@ -238,6 +236,9 @@ public class FactoryOverloadTests
 
     private class PolicyConfig
     {
-        public int MaxRetained { get; set; }
+        public int MaxRetained
+        {
+            get; set;
+        }
     }
 }

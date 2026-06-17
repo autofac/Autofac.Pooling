@@ -3,11 +3,9 @@
 
 namespace Autofac.Pooling.Tests.Common;
 
-public class OtherPooledComponent : IPooledService
+/// <summary>
+/// A trivial dependency injected into <see cref="DependentPooledComponent"/>.
+/// </summary>
+public class Dependency
 {
-    public int GetCalled => 0;
-
-    public int ReturnCalled => 0;
-
-    public int DisposeCalled => 0;
 }

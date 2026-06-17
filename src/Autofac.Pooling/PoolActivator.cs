@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Autofac Project. All rights reserved.
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
-using System;
 using Autofac.Core;
 using Autofac.Core.Resolving.Pipeline;
 using Microsoft.Extensions.ObjectPool;
@@ -9,48 +8,53 @@ using Microsoft.Extensions.ObjectPool;
 namespace Autofac.Pooling;
 
 /// <summary>
-/// An activator for creating new <see cref="ObjectPool{TLimit}"/> instances.
+/// An activator that creates the <see cref="ObjectPool{TLimit}"/> backing a
+/// pooled registration.
 /// </summary>
-/// <typeparam name="TLimit">The limit type of the objects in the pool.</typeparam>
+/// <typeparam name="TLimit">
+/// The limit type of the objects in the pool.
+/// </typeparam>
 internal sealed class PoolActivator<TLimit> : IInstanceActivator
     where TLimit : class
 {
-    private readonly Service? _pooledInstanceService;
-    private readonly IPooledRegistrationPolicy<TLimit>? _policy;
-    private readonly DefaultObjectPoolProvider? _poolProvider;
-    private readonly Func<IComponentContext, IPooledRegistrationPolicy<TLimit>>? _policyFactory;
+    private readonly Service _pooledInstanceService;
+    private readonly Func<IComponentContext, IPooledRegistrationPolicy<TLimit>> _policyFactory;
+    private readonly Func<IComponentContext, ObjectPoolProvider>? _providerFactory;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="PoolActivator{TLimit}"/> class
-    /// using the default <see cref="DefaultObjectPoolProvider"/>.
+    /// Initializes a new instance of the <see cref="PoolActivator{TLimit}"/>
+    /// class.
     /// </summary>
-    /// <param name="pooledInstanceService">The service used to resolve new instances of the pooled registration.</param>
-    /// <param name="policy">The pool policy.</param>
-    public PoolActivator(Service pooledInstanceService, IPooledRegistrationPolicy<TLimit> policy)
-    {
-        _pooledInstanceService = pooledInstanceService;
-        _policy = policy;
-        _poolProvider = new DefaultObjectPoolProvider
-        {
-            MaximumRetained = policy.MaximumRetained,
-        };
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PoolActivator{TLimit}"/> class
-    /// using a factory function to create the <see cref="IPooledRegistrationPolicy{TLimit}"/> at resolve time.
-    /// The default <see cref="DefaultObjectPoolProvider"/> will create the backing pool.
-    /// </summary>
-    /// <param name="pooledInstanceService">The service used to resolve new instances of the pooled registration.</param>
-    /// <param name="policyFactory">
-    /// A factory that returns the <see cref="IPooledRegistrationPolicy{TLimit}"/> to use.
-    /// Invoked during resolve, so the <see cref="IComponentContext"/> is available
-    /// for resolving dependencies.
+    /// <param name="pooledInstanceService">
+    /// The service used to resolve new instances of the pooled registration.
     /// </param>
-    public PoolActivator(Service pooledInstanceService, Func<IComponentContext, IPooledRegistrationPolicy<TLimit>> policyFactory)
+    /// <param name="policyFactory">
+    /// A factory that returns the policy to use, invoked when the pool is
+    /// built.
+    /// </param>
+    /// <param name="providerFactory">
+    /// An optional factory that returns the <see cref="ObjectPoolProvider"/>
+    /// that creates the backing pool, invoked when the pool is built. When
+    /// <see langword="null"/>, the default <see cref="DefaultObjectPoolProvider"/>
+    /// is used, sized from
+    /// <see cref="IPooledRegistrationPolicy{TLimit}.MaximumRetained"/>.
+    /// </param>
+    /// <remarks>
+    /// Both factories are invoked once during resolve, so the
+    /// <see cref="IComponentContext"/> is available for resolving dependencies.
+    /// </remarks>
+    /// <exception cref="ArgumentNullException">
+    /// Thrown when <paramref name="pooledInstanceService"/> or
+    /// <paramref name="policyFactory"/> is <see langword="null"/>.
+    /// </exception>
+    public PoolActivator(
+        Service pooledInstanceService,
+        Func<IComponentContext, IPooledRegistrationPolicy<TLimit>> policyFactory,
+        Func<IComponentContext, ObjectPoolProvider>? providerFactory = null)
     {
-        _pooledInstanceService = pooledInstanceService;
+        _pooledInstanceService = pooledInstanceService ?? throw new ArgumentNullException(nameof(pooledInstanceService));
         _policyFactory = policyFactory ?? throw new ArgumentNullException(nameof(policyFactory));
+        _providerFactory = providerFactory;
     }
 
     /// <inheritdoc/>
@@ -61,31 +65,21 @@ internal sealed class PoolActivator<TLimit> : IInstanceActivator
     {
         pipelineBuilder.Use(PipelinePhase.Activation, (context, next) =>
         {
-            if (_policyFactory is not null)
-            {
-                // Custom policy factory: resolve the strategy at resolve time, then create DefaultObjectPool.
-                var policy = _policyFactory(context);
-                var poolProvider = new DefaultObjectPoolProvider
-                {
-                    MaximumRetained = policy.MaximumRetained,
-                };
-                var scope = context.Resolve<ILifetimeScope>();
-                var poolPolicy = new AutofacPooledObjectPolicy<TLimit>(_pooledInstanceService!, scope, policy);
-                var pool = poolProvider.Create(poolPolicy);
-                context.Instance = new PooledInstanceContext<TLimit>(pool, policy);
-            }
-            else
-            {
-                // Default path: use DefaultObjectPoolProvider + AutofacPooledObjectPolicy.
-                var scope = context.Resolve<ILifetimeScope>();
+            var policy = _policyFactory(context);
+            var scope = context.Resolve<ILifetimeScope>();
+            var poolPolicy = new AutofacPooledObjectPolicy<TLimit>(_pooledInstanceService, scope, policy);
 
-                var poolPolicy = new AutofacPooledObjectPolicy<TLimit>(_pooledInstanceService!, scope, _policy!);
+            // Use the caller's provider when one was supplied; otherwise the
+            // default provider sized from the policy. A custom provider owns
+            // sizing and eviction, so MaximumRetained is intentionally consulted
+            // only on the default path. The default provider produces a
+            // disposable pool when TLimit implements IDisposable.
+            var provider = _providerFactory?.Invoke(context)
+                ?? new DefaultObjectPoolProvider { MaximumRetained = policy.MaximumRetained };
 
-                // The pool provider will create a disposable pool if the TLimit implements IDisposable.
-                var pool = _poolProvider!.Create(poolPolicy);
+            var pool = provider.Create(poolPolicy);
 
-                context.Instance = pool;
-            }
+            context.Instance = new PooledInstanceContext<TLimit>(pool, policy);
         });
     }
 

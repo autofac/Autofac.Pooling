@@ -1,9 +1,11 @@
-﻿using Autofac.Pooling.Tests.Common;
-using Xunit;
+﻿// Copyright (c) Autofac Project. All rights reserved.
+// Licensed under the MIT License. See LICENSE in the project root for license information.
+
+using Autofac.Pooling.Tests.Common;
 
 namespace Autofac.Pooling.Test;
 
-public class PoolingTest
+public class PoolingTests
 {
     [Fact]
     public void CanRegisterPooledService()
@@ -13,9 +15,10 @@ public class PoolingTest
         var activateCounter = 0;
 
         // Register a pooled instance. OnActivated only fires when actual instances of the component are created.
-        builder.RegisterType<PooledComponent>().As<IPooledService>()
-                                               .PooledInstancePerLifetimeScope()
-                                               .OnActivated(args => activateCounter++);
+        builder.RegisterType<PooledComponent>()
+            .As<IPooledService>()
+            .PooledInstancePerLifetimeScope()
+            .OnActivated(args => activateCounter++);
 
         var container = builder.Build();
 

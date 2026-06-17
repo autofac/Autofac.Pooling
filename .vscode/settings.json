@@ -7,5 +7,26 @@
   "coverage-gutters.coverageFileNames": [
     "**/coverage.cobertura.xml"
   ],
-  "omnisharp.enableEditorConfigSupport": true
+  "dotnet.defaultSolution": "Autofac.Pooling.sln",
+  "dotnet.unitTestDebuggingOptions": {
+    "enableStepFiltering": false,
+    "justMyCode": false,
+    "requireExactSource": false,
+    "sourceLinkOptions": {
+      "*": {
+        "enabled": true
+      }
+    },
+    "suppressJITOptimizations": true,
+    "symbolOptions": {
+      "searchNuGetOrgSymbolServer": true
+    }
+  },
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "*.resx": "$(capture).*.resx, $(capture).designer.cs, $(capture).designer.vb"
+  },
+  "files.watcherExclude": {
+    "**/target": true
+  }
 }

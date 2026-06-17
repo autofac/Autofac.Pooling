@@ -1,190 +1,190 @@
-﻿using Autofac.Core;
-using Autofac.Pooling.Tests.Shared;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Xunit;
+﻿// Copyright (c) Autofac Project. All rights reserved.
+// Licensed under the MIT License. See LICENSE in the project root for license information.
 
-namespace Autofac.Pooling.Test
+using Autofac.Core;
+using Autofac.Pooling.Tests.Common;
+
+namespace Autofac.Pooling.Test;
+
+public class PolicyTests
 {
-    public class PolicyTests
+    [Fact]
+    public void PolicyIsNotifiedAtCorrectPoints()
     {
-        [Fact]
-        public void PolicyIsNotifiedAtCorrectPoints()
-        {
-            var builder = new ContainerBuilder();
+        var builder = new ContainerBuilder();
 
-            var events = new List<string>();
+        var events = new List<string>();
 
-            var policy = new CustomPolicy<PooledComponent>(
-                (ctxt, param, getCallback) => {
-                    events.Add("get");
-                    return getCallback();
-                },
-                (instance) =>
-                {
-                    events.Add("return");
-                    return true;
-                });
-
-            builder.RegisterType<PooledComponent>().As<IPooledService>().PooledInstancePerLifetimeScope(policy);
-
-            var container = builder.Build();
-
-            using (var scope = container.BeginLifetimeScope())
+        var policy = new CustomPolicy<PooledComponent>(
+            (ctxt, param, getCallback) =>
             {
-                scope.Resolve<IPooledService>();
-            }
+                events.Add("get");
+                return getCallback();
+            },
+            (instance) =>
+            {
+                events.Add("return");
+                return true;
+            });
 
-            Assert.Equal(new[] { "get", "return" }, events);
+        builder.RegisterType<PooledComponent>().As<IPooledService>().PooledInstancePerLifetimeScope(policy);
+
+        var container = builder.Build();
+
+        using (var scope = container.BeginLifetimeScope())
+        {
+            scope.Resolve<IPooledService>();
         }
 
-        [Fact]
-        public void PolicyCanChooseNotToGetFromThePool()
-        {
-            var builder = new ContainerBuilder();
+        Assert.Equal(new[] { "get", "return" }, events);
+    }
 
-            var returnCalled = false;
+    [Fact]
+    public void PolicyCanChooseNotToGetFromThePool()
+    {
+        var builder = new ContainerBuilder();
 
-            var policy = new CustomPolicy<PooledComponent>(
-                (ctxt, param, getCallback) => {
-                    return new PooledComponent();
-                },
-                (instance) =>
-                {
-                    returnCalled = true;
-                    return true;
-                });
+        var returnCalled = false;
 
-            builder.RegisterType<PooledComponent>().As<IPooledService>().PooledInstancePerLifetimeScope(policy);
-
-            var container = builder.Build();
-
-            IPooledService pooledInstance;
-
-            using (var scope = container.BeginLifetimeScope())
+        var policy = new CustomPolicy<PooledComponent>(
+            (ctxt, param, getCallback) =>
             {
-                pooledInstance = scope.Resolve<IPooledService>();
+                return new PooledComponent();
+            },
+            (instance) =>
+            {
+                returnCalled = true;
+                return true;
+            });
 
-                Assert.Equal(0, pooledInstance.GetCalled);
-            }
+        builder.RegisterType<PooledComponent>().As<IPooledService>().PooledInstancePerLifetimeScope(policy);
 
-            Assert.Equal(0, pooledInstance.ReturnCalled);
-            Assert.Equal(1, pooledInstance.DisposeCalled);
-            Assert.False(returnCalled);
+        var container = builder.Build();
 
-            container.Dispose();
+        IPooledService pooledInstance;
+
+        using (var scope = container.BeginLifetimeScope())
+        {
+            pooledInstance = scope.Resolve<IPooledService>();
+
+            Assert.Equal(0, pooledInstance.GetCalled);
         }
 
-        [Fact]
-        public void PolicyCanChooseNotToReturnToThePool()
-        {
-            var builder = new ContainerBuilder();
+        Assert.Equal(0, pooledInstance.ReturnCalled);
+        Assert.Equal(1, pooledInstance.DisposeCalled);
+        Assert.False(returnCalled);
 
-            var counter = 0;
+        container.Dispose();
+    }
 
-            var policy = new CustomPolicy<PooledComponent>(
-                (ctxt, param, getCallback) => {
-                    counter++;
-                    return getCallback();
-                },
-                (instance) =>
-                {
-                    counter--;
-                    return false;
-                });
+    [Fact]
+    public void PolicyCanChooseNotToReturnToThePool()
+    {
+        var builder = new ContainerBuilder();
 
-            builder.RegisterType<PooledComponent>().As<IPooledService>().PooledInstancePerLifetimeScope(policy);
+        var counter = 0;
 
-            var container = builder.Build();
-
-            IPooledService pooledInstance;
-
-            using (var scope = container.BeginLifetimeScope())
+        var policy = new CustomPolicy<PooledComponent>(
+            (ctxt, param, getCallback) =>
             {
-                pooledInstance = scope.Resolve<IPooledService>();
+                counter++;
+                return getCallback();
+            },
+            (instance) =>
+            {
+                counter--;
+                return false;
+            });
 
-                Assert.Equal(1, counter);
-            }
+        builder.RegisterType<PooledComponent>().As<IPooledService>().PooledInstancePerLifetimeScope(policy);
 
-            Assert.Equal(0, counter);
-            Assert.Equal(1, pooledInstance.GetCalled);
-            Assert.Equal(1, pooledInstance.ReturnCalled);
-            Assert.Equal(1, pooledInstance.DisposeCalled);
+        var container = builder.Build();
 
-            container.Dispose();
+        IPooledService pooledInstance;
 
-            Assert.Equal(1, pooledInstance.DisposeCalled);
+        using (var scope = container.BeginLifetimeScope())
+        {
+            pooledInstance = scope.Resolve<IPooledService>();
+
+            Assert.Equal(1, counter);
         }
 
-        [Fact]
-        public void PolicyCanSeeParametersFromThePooledServiceResolve()
-        {
-            var builder = new ContainerBuilder();
+        Assert.Equal(0, counter);
+        Assert.Equal(1, pooledInstance.GetCalled);
+        Assert.Equal(1, pooledInstance.ReturnCalled);
+        Assert.Equal(1, pooledInstance.DisposeCalled);
 
-            List<Parameter> policyReceivedParameters = new List<Parameter>();
+        container.Dispose();
 
-            var policy = new CustomPolicy<PooledComponent>(
-                (ctxt, param, getCallback) => {
+        Assert.Equal(1, pooledInstance.DisposeCalled);
+    }
 
-                    policyReceivedParameters.AddRange(param);
+    [Fact]
+    public void PolicyCanSeeParametersFromThePooledServiceResolve()
+    {
+        var builder = new ContainerBuilder();
 
-                    return getCallback();
-                },
-                (instance) =>
-                {
-                    return false;
-                });
+        var policyReceivedParameters = new List<Parameter>();
 
-            builder.RegisterType<PooledComponent>().As<IPooledService>().PooledInstancePerLifetimeScope(policy);
-
-            var container = builder.Build();
-
-            IPooledService pooledInstance;
-
-            using (var scope = container.BeginLifetimeScope())
+        var policy = new CustomPolicy<PooledComponent>(
+            (ctxt, param, getCallback) =>
             {
-                pooledInstance = scope.Resolve<IPooledService>(new NamedParameter("Val1", 123), new TypedParameter(typeof(int), 456));
-            }
+                policyReceivedParameters.AddRange(param);
 
-            Assert.Collection(policyReceivedParameters,
-                p =>
-                {
-                    Assert.Equal("Val1", (p as NamedParameter)?.Name);
-                },
-                p =>
-                {
-                    Assert.Equal(456, (p as TypedParameter)?.Value);
-                });
+                return getCallback();
+            },
+            (instance) =>
+            {
+                return false;
+            });
 
-            container.Dispose();
+        builder.RegisterType<PooledComponent>().As<IPooledService>().PooledInstancePerLifetimeScope(policy);
+
+        var container = builder.Build();
+
+        using (var scope = container.BeginLifetimeScope())
+        {
+            _ = scope.Resolve<IPooledService>(new NamedParameter("Val1", 123), new TypedParameter(typeof(int), 456));
         }
 
-        private class CustomPolicy<TLimit> : IPooledRegistrationPolicy<TLimit>
-            where TLimit : class
+        Assert.Collection(
+            policyReceivedParameters,
+            p =>
+            {
+                Assert.Equal("Val1", (p as NamedParameter)?.Name);
+            },
+            p =>
+            {
+                Assert.Equal(456, (p as TypedParameter)?.Value);
+            });
+
+        container.Dispose();
+    }
+
+    private class CustomPolicy<TLimit> : IPooledRegistrationPolicy<TLimit>
+        where TLimit : class
+    {
+        private readonly Func<IComponentContext, IEnumerable<Parameter>, Func<TLimit>, TLimit> _get;
+        private readonly Func<TLimit, bool> _return;
+
+        public int MaximumRetained => 6;
+
+        public CustomPolicy(
+            Func<IComponentContext, IEnumerable<Parameter>, Func<TLimit>, TLimit> get,
+            Func<TLimit, bool> @return)
         {
-            private readonly Func<IComponentContext, IEnumerable<Parameter>, Func<TLimit>, TLimit> _get;
-            private readonly Func<TLimit, bool> _return;
+            _get = get;
+            _return = @return;
+        }
 
-            public int MaximumRetained => 6;
+        public TLimit Get(IComponentContext context, IEnumerable<Parameter> parameters, Func<TLimit> getFromPool)
+        {
+            return _get(context, parameters, getFromPool);
+        }
 
-            public CustomPolicy(
-                Func<IComponentContext, IEnumerable<Parameter>, Func<TLimit>, TLimit> get,
-                Func<TLimit, bool> @return)
-            {
-                _get = get;
-                _return = @return;
-            }
-
-            public TLimit Get(IComponentContext context, IEnumerable<Parameter> parameters, Func<TLimit> getFromPool)
-            {
-                return _get(context, parameters, getFromPool);
-            }
-
-            public bool Return(TLimit pooledObject)
-            {
-                return _return(pooledObject);
-            }
+        public bool Return(TLimit pooledObject)
+        {
+            return _return(pooledObject);
         }
     }
 }

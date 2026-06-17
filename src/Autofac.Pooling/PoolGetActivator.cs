@@ -5,7 +5,6 @@ using System;
 using System.Globalization;
 using Autofac.Core;
 using Autofac.Core.Resolving.Pipeline;
-using Microsoft.Extensions.ObjectPool;
 
 namespace Autofac.Pooling;
 
@@ -17,24 +16,16 @@ internal sealed class PoolGetActivator<TLimit> : IInstanceActivator
     where TLimit : class
 {
     private readonly PoolService _poolService;
-    private readonly IPooledRegistrationPolicy<TLimit>? _registrationPolicy;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PoolGetActivator{TLimit}"/> class.
     /// </summary>
     /// <param name="poolService">The service used to access the pool.</param>
-    /// <param name="registrationPolicy">The registration policy for the pool.</param>
-    public PoolGetActivator(PoolService poolService, IPooledRegistrationPolicy<TLimit> registrationPolicy)
-    {
-        _poolService = poolService;
-        _registrationPolicy = registrationPolicy;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PoolGetActivator{TLimit}"/> class.
-    /// The policy will be retrieved from the <see cref="PooledInstanceContext{TLimit}"/> at resolve time.
-    /// </summary>
-    /// <param name="poolService">The service used to access the pool.</param>
+    /// <remarks>
+    /// The pool and its policy are retrieved from the
+    /// <see cref="PooledInstanceContext{TLimit}"/> resolved through
+    /// <paramref name="poolService"/> at resolve time.
+    /// </remarks>
     public PoolGetActivator(PoolService poolService)
     {
         _poolService = poolService;
@@ -48,10 +39,9 @@ internal sealed class PoolGetActivator<TLimit> : IInstanceActivator
     {
         pipelineBuilder.Use(PipelinePhase.Activation, (ctxt, next) =>
         {
-            var resolved = ctxt.ResolveService(_poolService);
-            var ctx = resolved as PooledInstanceContext<TLimit>;
-            var pool = ctx is not null ? ctx.Pool : (ObjectPool<TLimit>)resolved;
-            var policy = ctx is not null ? ctx.Policy : _registrationPolicy!;
+            var ctx = (PooledInstanceContext<TLimit>)ctxt.ResolveService(_poolService);
+            var pool = ctx.Pool;
+            var policy = ctx.Policy;
             var didGetFromPool = false;
 
             TLimit PoolGet()

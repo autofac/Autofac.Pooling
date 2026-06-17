@@ -183,6 +183,35 @@ public class FactoryOverloadTests
     }
 
     [Fact]
+    public void PolicyFactory_DisposableRegistrationsDisposedWhenContainerIsDisposed()
+    {
+        // Regression test: the policyFactory path stores a PooledInstanceContext wrapper as the pool
+        // instance. That wrapper must be IDisposable and cascade disposal to the underlying
+        // DisposableObjectPool, otherwise retained disposable instances leak at container shutdown.
+        var builder = new ContainerBuilder();
+
+        builder.RegisterType<PooledComponent>()
+               .As<IPooledService>()
+               .PooledInstancePerLifetimeScope(ctx => new DefaultPooledRegistrationPolicy<PooledComponent>());
+
+        var container = builder.Build();
+
+        IPooledService pooledInstance;
+
+        using (var scope = container.BeginLifetimeScope())
+        {
+            pooledInstance = scope.Resolve<IPooledService>();
+        }
+
+        // Returned to the pool, but not disposed.
+        Assert.Equal(0, pooledInstance.DisposeCalled);
+
+        container.Dispose();
+
+        Assert.Equal(1, pooledInstance.DisposeCalled);
+    }
+
+    [Fact]
     public void PolicyFactory_NullPolicyFactoryThrows()
     {
         var builder = new ContainerBuilder();

@@ -30,7 +30,7 @@
     {
       "args": [
         "build",
-        "Autofac.Pooling.sln",
+        "${workspaceFolder}/Autofac.Pooling.sln",
         "--tl:off",
         "/property:GenerateFullPaths=true",
         "/consoleloggerparameters:NoSummary"

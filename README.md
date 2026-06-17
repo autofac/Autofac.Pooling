@@ -1,18 +1,17 @@
 # Autofac.Pooling
 
-[![Build status](https://github.com/autofac/Autofac.Pooling/actions/workflows/main.yml/badge.svg?branch=develop)](https://github.com/autofac/Autofac.Pooling/actions/workflows/main.yml)
+Support for pooled instance lifetime scopes in [Autofac](https://autofac.org) dependency injection. Autofac can help you implement a pool of components in your application without you having to write your own pooling implementation, and making these pooled components feel more natural in the world of DI.
 
-Support for pooled instance lifetime scopes in Autofac dependency injection.
-
-Autofac can help you implement a pool of components in your application without you having to write your own pooling implementation, and making these pooled components feel more natural in the world of DI.
+[![Build status](https://github.com/autofac/Autofac.Pooling/actions/workflows/main.yml/badge.svg)](https://github.com/autofac/Autofac.Pooling/actions/workflows/main.yml) [![codecov](https://codecov.io/gh/Autofac/Autofac.Pooling/branch/develop/graph/badge.svg)](https://codecov.io/gh/Autofac/Autofac.Pooling) [![NuGet](https://img.shields.io/nuget/v/Autofac.Pooling.svg)](https://nuget.org/packages/Autofac.Pooling)
 
 Please file issues and pull requests for this package in this repository rather than in the Autofac core repo.
 
 - [Documentation](https://autofac.readthedocs.io/advanced/pooled-instances.html)
 - [NuGet](https://www.nuget.org/packages/Autofac.Pooling)
 - [Contributing](https://autofac.readthedocs.io/en/latest/contributors.html)
+- [Open in Visual Studio Code](https://open.vscode.dev/autofac/Autofac.Pooling)
 
-## Getting Started
+## Quick Start
 
 Once you've added a reference to the `Autofac.Pooling` package, you can start using the new `PooledInstancePerLifetimeScope` and `PooledInstancePerMatchingLifetimeScope` methods:
 

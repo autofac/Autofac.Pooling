@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿// Copyright (c) Autofac Project. All rights reserved.
+// Licensed under the MIT License. See LICENSE in the project root for license information.
+
 using Autofac.Core;
 using Autofac.Pooling.Tests.Common;
-using Xunit;
 
 namespace Autofac.Pooling.Test;
 
@@ -130,7 +129,6 @@ public class PolicyTests
         var policy = new CustomPolicy<PooledComponent>(
             (ctxt, param, getCallback) =>
             {
-
                 policyReceivedParameters.AddRange(param);
 
                 return getCallback();
@@ -146,10 +144,11 @@ public class PolicyTests
 
         using (var scope = container.BeginLifetimeScope())
         {
-            var _ = scope.Resolve<IPooledService>(new NamedParameter("Val1", 123), new TypedParameter(typeof(int), 456));
+            _ = scope.Resolve<IPooledService>(new NamedParameter("Val1", 123), new TypedParameter(typeof(int), 456));
         }
 
-        Assert.Collection(policyReceivedParameters,
+        Assert.Collection(
+            policyReceivedParameters,
             p =>
             {
                 Assert.Equal("Val1", (p as NamedParameter)?.Name);

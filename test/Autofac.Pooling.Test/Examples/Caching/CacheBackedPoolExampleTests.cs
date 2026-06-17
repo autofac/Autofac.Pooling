@@ -2,7 +2,6 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 
 using Microsoft.Extensions.Caching.Memory;
-using Xunit;
 
 namespace Autofac.Pooling.Test.Examples.Caching;
 

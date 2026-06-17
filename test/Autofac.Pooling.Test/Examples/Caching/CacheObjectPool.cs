@@ -3,7 +3,6 @@
 
 #nullable enable
 
-using System;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.ObjectPool;
 

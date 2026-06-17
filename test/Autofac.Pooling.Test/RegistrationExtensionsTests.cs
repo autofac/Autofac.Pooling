@@ -3,13 +3,17 @@
 
 using Autofac.Builder;
 using Autofac.Pooling.Tests.Common;
+using Microsoft.Extensions.ObjectPool;
 
 namespace Autofac.Pooling.Test;
 
 public class RegistrationExtensionsTests
 {
+    private static IRegistrationBuilder<PooledComponent, ConcreteReflectionActivatorData, SingleRegistrationStyle> NullRegistration
+        => null!;
+
     [Fact]
-    public void RequiresCallbackContainer()
+    public void PooledInstancePerLifetimeScope_RequiresCallbackContainer()
     {
         // Manually create a registration builder, then call AsPooled
         var regBuilder = RegistrationBuilder.ForType<PooledComponent>();
@@ -18,7 +22,7 @@ public class RegistrationExtensionsTests
     }
 
     [Fact]
-    public void MatchingScopeWithMaximumRetainedRegistersAndResolves()
+    public void PooledInstancePerMatchingLifetimeScope_RegistersAndResolves()
     {
         var builder = new ContainerBuilder();
 
@@ -44,7 +48,7 @@ public class RegistrationExtensionsTests
     }
 
     [Fact]
-    public void LifetimeOverriddenAfterPoolingSkipsPoolRegistrations()
+    public void PooledInstancePerLifetimeScope_LifetimeOverriddenAfterPoolingSkipsPoolRegistrations()
     {
         // Changing the lifetime after PooledInstancePerLifetimeScope means the
         // deferred callback should fall back to the original behavior and not
@@ -70,7 +74,7 @@ public class RegistrationExtensionsTests
     }
 
     [Fact]
-    public void DistinctPooledTypesGetDistinctPools()
+    public void PooledInstancePerLifetimeScope_DistinctPooledTypesGetDistinctPools()
     {
         // Exercises PoolService equality/hash-code: two pooled registrations
         // must resolve to independent pools rather than sharing one.
@@ -100,7 +104,7 @@ public class RegistrationExtensionsTests
 
     [Fact]
     [SuppressMessage("CA2000", "CA2000", Justification = "The container will dispose of the object.")]
-    public void NoProvidedInstances()
+    public void PooledInstancePerLifetimeScope_NoProvidedInstances()
     {
         var builder = new ContainerBuilder();
 
@@ -110,7 +114,7 @@ public class RegistrationExtensionsTests
     }
 
     [Fact]
-    public void OnReleaseNotCompatible()
+    public void PooledInstancePerLifetimeScope_OnReleaseNotCompatible()
     {
         var builder = new ContainerBuilder();
 
@@ -122,7 +126,7 @@ public class RegistrationExtensionsTests
     }
 
     [Fact]
-    public void OtherLifecycleEventsAreCompatible()
+    public void PooledInstancePerLifetimeScope_OtherLifecycleEventsAreCompatible()
     {
         // A non-OnRelease lifecycle event adds a CoreEventMiddleware of a
         // different event type; pooling must allow it (only OnRelease is
@@ -146,5 +150,143 @@ public class RegistrationExtensionsTests
         Assert.True(activated);
 
         container.Dispose();
+    }
+
+    [Fact]
+    public void PooledInstancePerLifetimeScope_NullRegistration()
+    {
+        Assert.Throws<ArgumentNullException>(() => NullRegistration.PooledInstancePerLifetimeScope());
+    }
+
+    [Fact]
+    public void PooledInstancePerLifetimeScope_NullRegistrationWithMaximumRetained()
+    {
+        Assert.Throws<ArgumentNullException>(() => NullRegistration.PooledInstancePerLifetimeScope(8));
+    }
+
+    [Fact]
+    public void PooledInstancePerLifetimeScope_NullRegistrationWithPolicy()
+    {
+        Assert.Throws<ArgumentNullException>(() => NullRegistration.PooledInstancePerLifetimeScope(new DefaultPooledRegistrationPolicy<PooledComponent>()));
+    }
+
+    [Fact]
+    public void PooledInstancePerLifetimeScope_NullRegistrationWithPolicyFactory()
+    {
+        Assert.Throws<ArgumentNullException>(() => NullRegistration.PooledInstancePerLifetimeScope(ctx => new DefaultPooledRegistrationPolicy<PooledComponent>()));
+    }
+
+    [Fact]
+    public void PooledInstancePerLifetimeScope_NullRegistrationWithProviderFactory()
+    {
+        Assert.Throws<ArgumentNullException>(() => NullRegistration.PooledInstancePerLifetimeScope(ctx => new DefaultObjectPoolProvider()));
+    }
+
+    [Fact]
+    public void PooledInstancePerLifetimeScope_NullRegistrationWithPolicyAndProviderFactory()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            NullRegistration.PooledInstancePerLifetimeScope(
+                ctx => new DefaultPooledRegistrationPolicy<PooledComponent>(),
+                ctx => new DefaultObjectPoolProvider()));
+    }
+
+    [Fact]
+    public void PooledInstancePerLifetimeScope_NullPolicy()
+    {
+        var reg = new ContainerBuilder()
+            .RegisterType<PooledComponent>()
+            .As<IPooledService>();
+
+        Assert.Throws<ArgumentNullException>(() =>
+            reg.PooledInstancePerLifetimeScope((IPooledRegistrationPolicy<PooledComponent>)null!));
+    }
+
+    [Fact]
+    public void PooledInstancePerMatchingLifetimeScope_NullRegistration()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            NullRegistration.PooledInstancePerMatchingLifetimeScope("tag"));
+    }
+
+    [Fact]
+    public void PooledInstancePerMatchingLifetimeScope_NullRegistrationWithMaximumRetained()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            NullRegistration.PooledInstancePerMatchingLifetimeScope(8, "tag"));
+    }
+
+    [Fact]
+    public void PooledInstancePerMatchingLifetimeScope_NullRegistrationWithPolicy()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            NullRegistration.PooledInstancePerMatchingLifetimeScope(
+                new DefaultPooledRegistrationPolicy<PooledComponent>(), "tag"));
+    }
+
+    [Fact]
+    public void PooledInstancePerMatchingLifetimeScope_NullRegistrationWithPolicyFactory()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            NullRegistration.PooledInstancePerMatchingLifetimeScope(
+                ctx => new DefaultPooledRegistrationPolicy<PooledComponent>(), "tag"));
+    }
+
+    [Fact]
+    public void PooledInstancePerMatchingLifetimeScope_NullRegistrationWithProviderFactory()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            NullRegistration.PooledInstancePerMatchingLifetimeScope(
+                ctx => new DefaultObjectPoolProvider(), "tag"));
+    }
+
+    [Fact]
+    public void PooledInstancePerMatchingLifetimeScope_NullRegistrationWithPolicyAndProviderFactory()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            NullRegistration.PooledInstancePerMatchingLifetimeScope(
+                ctx => new DefaultPooledRegistrationPolicy<PooledComponent>(),
+                ctx => new DefaultObjectPoolProvider(),
+                "tag"));
+    }
+
+    [Fact]
+    public void PooledInstancePerMatchingLifetimeScope_NullPolicy()
+    {
+        var reg = new ContainerBuilder()
+            .RegisterType<PooledComponent>()
+            .As<IPooledService>();
+
+        Assert.Throws<ArgumentNullException>(() =>
+            reg.PooledInstancePerMatchingLifetimeScope(
+                (IPooledRegistrationPolicy<PooledComponent>)null!, "tag"));
+    }
+
+    [Fact]
+    public void PooledInstancePerMatchingLifetimeScope_NullPolicyFactory()
+    {
+        var reg = new ContainerBuilder()
+            .RegisterType<PooledComponent>()
+            .As<IPooledService>();
+
+        Assert.Throws<ArgumentNullException>(() =>
+            reg.PooledInstancePerMatchingLifetimeScope(
+                null!,
+                ctx => new DefaultObjectPoolProvider(),
+                "tag"));
+    }
+
+    [Fact]
+    public void PooledInstancePerMatchingLifetimeScope_NullProviderFactory()
+    {
+        var reg = new ContainerBuilder()
+            .RegisterType<PooledComponent>()
+            .As<IPooledService>();
+
+        Assert.Throws<ArgumentNullException>(() =>
+            reg.PooledInstancePerMatchingLifetimeScope(
+                ctx => new DefaultPooledRegistrationPolicy<PooledComponent>(),
+                null!,
+                "tag"));
     }
 }

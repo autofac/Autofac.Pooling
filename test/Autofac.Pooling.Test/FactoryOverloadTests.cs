@@ -208,7 +208,7 @@ public class FactoryOverloadTests
     }
 
     [Fact]
-    public void PolicyFactory_NullPolicyFactoryThrows()
+    public void PolicyFactory_NullPolicyFactory()
     {
         var builder = new ContainerBuilder();
 
@@ -221,7 +221,7 @@ public class FactoryOverloadTests
     }
 
     [Fact]
-    public void PolicyFactory_NullPolicyFactoryWithMatchingScopeThrows()
+    public void PolicyFactory_NullPolicyFactoryWithMatchingScope()
     {
         var builder = new ContainerBuilder();
 

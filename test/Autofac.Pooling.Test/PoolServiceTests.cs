@@ -9,7 +9,7 @@ namespace Autofac.Pooling.Test;
 public class PoolServiceTests
 {
     [Fact]
-    public void DescriptionIncludesTheLimitType()
+    public void Ctor_DescriptionIncludesTheLimitType()
     {
         var registration = RegistrationFor<PooledComponent>();
 
@@ -19,7 +19,7 @@ public class PoolServiceTests
     }
 
     [Fact]
-    public void EqualsIsTrueForTheSameUnderlyingRegistration()
+    public void Equals_SameUnderlyingRegistration()
     {
         var registration = RegistrationFor<PooledComponent>();
 
@@ -31,7 +31,7 @@ public class PoolServiceTests
     }
 
     [Fact]
-    public void EqualsIsFalseForDifferentRegistrations()
+    public void Equals_DifferentRegistrations()
     {
         var first = new PoolService(RegistrationFor<PooledComponent>());
         var second = new PoolService(RegistrationFor<OtherPooledComponent>());
@@ -40,7 +40,7 @@ public class PoolServiceTests
     }
 
     [Fact]
-    public void EqualsObjectMatchesAnotherPoolService()
+    public void EqualsObject_MatchesAnotherPoolService()
     {
         var registration = RegistrationFor<PooledComponent>();
 
@@ -51,7 +51,7 @@ public class PoolServiceTests
     }
 
     [Fact]
-    public void EqualsObjectIsFalseForUnrelatedType()
+    public void EqualsObject_UnrelatedType()
     {
         var service = new PoolService(RegistrationFor<PooledComponent>());
 
@@ -60,7 +60,7 @@ public class PoolServiceTests
 
     [Fact]
     [SuppressMessage("CA1508", "CA1508", Justification = "Deliberately exercising the Equals null branch for coverage.")]
-    public void EqualsIsFalseForNull()
+    public void EqualsObject_Null()
     {
         var service = new PoolService(RegistrationFor<PooledComponent>());
 

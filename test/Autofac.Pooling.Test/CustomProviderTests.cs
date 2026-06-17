@@ -292,7 +292,7 @@ public class CustomProviderTests
     }
 
     [Fact]
-    public void Provider_NullProviderFactoryThrows()
+    public void Provider_NullProviderFactory()
     {
         var builder = new ContainerBuilder();
 
@@ -305,7 +305,7 @@ public class CustomProviderTests
     }
 
     [Fact]
-    public void Provider_NullProviderFactoryWithPolicyThrows()
+    public void Provider_NullProviderFactoryWithPolicy()
     {
         var builder = new ContainerBuilder();
 
@@ -315,11 +315,11 @@ public class CustomProviderTests
         Assert.Throws<ArgumentNullException>(() =>
             reg.PooledInstancePerLifetimeScope(
                 ctx => new DefaultPooledRegistrationPolicy<PooledComponent>(),
-                (Func<IComponentContext, ObjectPoolProvider>)null!));
+                null!));
     }
 
     [Fact]
-    public void Provider_NullPolicyFactoryWithProviderThrows()
+    public void Provider_NullPolicyFactoryWithProvider()
     {
         var builder = new ContainerBuilder();
 
@@ -328,12 +328,12 @@ public class CustomProviderTests
 
         Assert.Throws<ArgumentNullException>(() =>
             reg.PooledInstancePerLifetimeScope(
-                (Func<IComponentContext, IPooledRegistrationPolicy<PooledComponent>>)null!,
+                null!,
                 ctx => new TrackingObjectPoolProvider()));
     }
 
     [Fact]
-    public void Provider_NullProviderFactoryWithMatchingScopeThrows()
+    public void Provider_NullProviderFactoryWithMatchingScope()
     {
         var builder = new ContainerBuilder();
 

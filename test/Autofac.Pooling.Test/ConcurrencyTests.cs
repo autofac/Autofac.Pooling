@@ -13,8 +13,9 @@ public class ConcurrencyTests
     {
         var builder = new ContainerBuilder();
 
-        builder.RegisterType<PooledComponent>().As<IPooledService>()
-                                               .PooledInstancePerLifetimeScope();
+        builder.RegisterType<PooledComponent>()
+               .As<IPooledService>()
+               .PooledInstancePerLifetimeScope();
 
         var container = builder.Build();
 
@@ -39,8 +40,9 @@ public class ConcurrencyTests
 
         using var blockingPolicy = new BlockingPolicy<PooledComponent>(4);
 
-        builder.RegisterType<PooledComponent>().As<IPooledService>()
-                                               .PooledInstancePerLifetimeScope(blockingPolicy);
+        builder.RegisterType<PooledComponent>()
+            .As<IPooledService>()
+            .PooledInstancePerLifetimeScope(blockingPolicy);
 
         var container = builder.Build();
 

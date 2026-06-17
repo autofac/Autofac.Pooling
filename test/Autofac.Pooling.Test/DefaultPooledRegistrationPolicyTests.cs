@@ -8,15 +8,7 @@ namespace Autofac.Pooling.Test;
 public class DefaultPooledRegistrationPolicyTests
 {
     [Fact]
-    public void DefaultConstructorUsesTwiceProcessorCount()
-    {
-        var policy = new DefaultPooledRegistrationPolicy<PooledComponent>();
-
-        Assert.Equal(Environment.ProcessorCount * 2, policy.MaximumRetained);
-    }
-
-    [Fact]
-    public void MaximumRetainedConstructorUsesSuppliedValue()
+    public void Ctor_MaximumRetainedUsesSuppliedValue()
     {
         var policy = new DefaultPooledRegistrationPolicy<PooledComponent>(3);
 
@@ -24,7 +16,15 @@ public class DefaultPooledRegistrationPolicyTests
     }
 
     [Fact]
-    public void ZeroMaximumRetainedIsAllowed()
+    public void Ctor_MaximumRetainedUsesTwiceProcessorCount()
+    {
+        var policy = new DefaultPooledRegistrationPolicy<PooledComponent>();
+
+        Assert.Equal(Environment.ProcessorCount * 2, policy.MaximumRetained);
+    }
+
+    [Fact]
+    public void Ctor_ZeroMaximumRetainedIsAllowed()
     {
         var policy = new DefaultPooledRegistrationPolicy<PooledComponent>(0);
 
@@ -32,14 +32,14 @@ public class DefaultPooledRegistrationPolicyTests
     }
 
     [Fact]
-    public void NegativeMaximumRetainedThrows()
+    public void Ctor_NegativeMaximumRetainedThrows()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() =>
             new DefaultPooledRegistrationPolicy<PooledComponent>(-1));
     }
 
     [Fact]
-    public void GetInvokesTheGetFromPoolCallback()
+    public void Get_InvokesTheGetFromPoolCallback()
     {
         var policy = new DefaultPooledRegistrationPolicy<PooledComponent>();
         using var expected = new PooledComponent();
@@ -50,7 +50,7 @@ public class DefaultPooledRegistrationPolicyTests
     }
 
     [Fact]
-    public void GetWithNullGetFromPoolThrows()
+    public void Get_NullGetFromPool()
     {
         var policy = new DefaultPooledRegistrationPolicy<PooledComponent>();
 
@@ -59,7 +59,7 @@ public class DefaultPooledRegistrationPolicyTests
     }
 
     [Fact]
-    public void ReturnAlwaysAcceptsTheInstance()
+    public void Return_AlwaysAcceptsTheInstance()
     {
         var policy = new DefaultPooledRegistrationPolicy<PooledComponent>();
         using var instance = new PooledComponent();

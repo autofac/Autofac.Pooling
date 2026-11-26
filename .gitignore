@@ -171,3 +171,6 @@ $RECYCLE.BIN/
 
 # Reasonix AI assistant
 .reasonix/
+
+# APM dependencies
+apm_modules/
